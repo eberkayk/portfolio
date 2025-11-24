@@ -28,7 +28,7 @@ const CATEGORIES: { key: string; label: string }[] = [
   { key: "ui/ux",       label: "UI/UX" },
   { key: "music",        label: "MUSIC" },
 ];
-
+//111
 export default function HomePage() {
   const [featured, setFeatured] = useState<Work[]>([]);
   const [allWorks, setAllWorks] = useState<Work[]>([]);
