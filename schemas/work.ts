@@ -43,7 +43,7 @@ export default defineType({
       options: {
         list: [
           { title: 'Illustration', value: 'illustration' },
-          { title: 'Design', value: 'design' },
+          { title: 'UI/UX', value: 'ui/ux' },
           { title: 'Music', value: 'music' },
         ],
       },

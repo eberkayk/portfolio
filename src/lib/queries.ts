@@ -5,7 +5,10 @@ export const ABOUT_PAGE = `
     title,
     email,
     thingsIDo,
-    toolsIUse,
+    toolsIUse[] {
+      name,
+      logo
+    },
     experience[] {
       company,
       role,
@@ -25,27 +28,29 @@ export const ABOUT_PAGE = `
 `;
 
 export const FEATURED_WORKS = `
-  *[_type == "work" && featured == true] | order(_createdAt desc) {
+  *[_type == "work" && featured == true] | order(createdAt desc) {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     category,
     featured,
     image,
+    description,
     images,
-    description
+    createdAt
   }
 `;
 
 export const ALL_WORKS = `
-  *[_type == "work"] | order(_createdAt desc) {
+  *[_type == "work"] | order(createdAt desc) {
     _id,
     title,
-    "slug": slug.current,
+    slug,
     category,
     featured,
     image,
+    description,
     images,
-    description
+    createdAt
   }
 `;

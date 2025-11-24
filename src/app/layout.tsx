@@ -5,7 +5,12 @@ import ClientLayout from "@/components/ClientLayout";
 import LenisProvider from "@/components/LenisProvider";
 import CustomCursor from "@/components/CustomCursor";
 
-const montserrat = Montserrat({ subsets: ["latin"] });
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
 
 export const metadata = {
   title: "Anıl Emmiler Portfolio",
@@ -16,8 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={`${montserrat.className} bg-white text-black overflow-hidden`}
-      >
+        className={`${montserrat.className} antialiased`}>
         {/* 🧠 Lenis global smooth scroll */}
         <LenisProvider>
           <ClientLayout>{children}</ClientLayout>

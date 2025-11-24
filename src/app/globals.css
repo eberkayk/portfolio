@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Montserrat font import */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+/* Apply Montserrat globally to everything */
+@layer base {
+  * {
+    font-family: var(--font-montserrat), sans-serif;
+  }
+  
+  html, body {
+    font-family: var(--font-montserrat), sans-serif;
+  }
+}
 
 /* global colors & font smoothing */
 html, body {
@@ -78,7 +86,7 @@ a {
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
 }
 
-/* Ana container scrollbar'ını da gizle */
+/* Ana container scrollbarını da gizle */
 body::-webkit-scrollbar {
   width: 8px;
 }
