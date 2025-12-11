@@ -21,6 +21,22 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* HIDE BODY SCROLLBAR COMPLETELY */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow-y: scroll;
+}
+
+/* Hide default cursor for custom cursor */
+* {
+  cursor: none !important;
+}
+
 /* global link style */
 a {
   @apply transition-colors duration-300 ease-[cubic-bezier(.16,1,.3,1)];
@@ -55,56 +71,7 @@ a {
   scrollbar-color: #d4d4d4 transparent;
 }
 
-/* Modern gizli scrollbar - sadece hover'da görünür */
-.modal-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.modal-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.modal-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.modal-scroll:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.modal-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-/* Firefox */
-.modal-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
-}
-
-/* Ana container scrollbarını da gizle */
-body::-webkit-scrollbar {
-  width: 8px;
-}
-
-body::-webkit-scrollbar-track {
-  background: #f5f5f5;
-}
-
-body::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
-  border-radius: 10px;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
-}
-
-/* Modern Custom Scrollbar - Modal için */
+/* Modern Custom Scrollbar - Modal için (YEŞİL) */
 .custom-scrollbar::-webkit-scrollbar {
   width: 10px;
 }
@@ -136,35 +103,28 @@ body::-webkit-scrollbar-thumb:hover {
   scrollbar-color: rgba(0, 176, 80, 0.5) rgba(0, 0, 0, 0.02);
 }
 
-/* Alternatif minimal stil istersen */
-.minimal-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.minimal-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.minimal-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
-.minimal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
-
 /* Gizli scrollbar (sadece scroll yapılabilir) */
-.invisible-scrollbar::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.invisible-scrollbar {
+.scrollbar-hide {
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.invisible-scrollbar::-ms-scrollbar {
-  display: none;
+/* Scroll Animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.5s ease-out forwards;
 }

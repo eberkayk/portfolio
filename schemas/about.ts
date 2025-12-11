@@ -141,6 +141,11 @@ export default defineType({
               type: 'string',
             },
             {
+              name: 'degreeType',
+              title: 'Degree Type',
+              type: 'string',
+            },
+            {
               name: 'logo',
               title: 'School Logo',
               type: 'image',

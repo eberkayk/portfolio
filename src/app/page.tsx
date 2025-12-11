@@ -8,7 +8,7 @@ import { client, urlFor } from "@/lib/sanity";
 import { FEATURED_WORKS, ALL_WORKS } from "@/lib/queries";
 import logoAnimation from "../../public/logo.json";
 
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 type Work = {
   _id: string;
@@ -23,10 +23,10 @@ type Work = {
 };
 
 const CATEGORIES: { key: string; label: string }[] = [
-  { key: "all",          label: "ALL WORKS" },
+  { key: "all", label: "ALL WORKS" },
   { key: "illustration", label: "ILLUSTRATION" },
-  { key: "ui/ux",       label: "UI/UX" },
-  { key: "music",        label: "MUSIC" },
+  { key: "ui/ux", label: "UI/UX" },
+  { key: "music", label: "MUSIC" },
 ];
 //111
 export default function HomePage() {
@@ -39,10 +39,15 @@ export default function HomePage() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lightboxScrollRef = useRef<HTMLDivElement>(null);
 
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const workCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
+  const [velocity, setVelocity] = useState(0);
+  const animationRef = useRef<number>();
   const [isLightboxDragging, setIsLightboxDragging] = useState(false);
   const [lightboxStartX, setLightboxStartX] = useState(0);
   const [lightboxScrollLeft, setLightboxScrollLeft] = useState(0);
@@ -50,33 +55,82 @@ export default function HomePage() {
   const handleMouseDown = (e: React.MouseEvent) => {
     const container = scrollContainerRef.current;
     if (!container) return;
+
     setIsDragging(true);
     setStartX(e.pageX - container.offsetLeft);
     setScrollLeft(container.scrollLeft);
-    container.style.cursor = 'grabbing';
+    setVelocity(0);
+
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    container.style.cursor = "grabbing";
+    container.style.scrollBehavior = "auto";
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging) return;
     const container = scrollContainerRef.current;
     if (!container) return;
+
     e.preventDefault();
     const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 2;
+    const walk = (x - startX) * 2.5;
+
+    setVelocity(walk - (container.scrollLeft - scrollLeft));
     container.scrollLeft = scrollLeft - walk;
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
     const container = scrollContainerRef.current;
-    if (container) container.style.cursor = 'grab';
+    if (container) {
+      container.style.cursor = "grab";
+      container.style.scrollBehavior = "smooth";
+
+      // Apply momentum
+      let currentVelocity = velocity;
+      const friction = 0.95;
+
+      const animate = () => {
+        if (Math.abs(currentVelocity) > 0.5) {
+          currentVelocity *= friction;
+          container.scrollLeft -= currentVelocity;
+          animationRef.current = requestAnimationFrame(animate);
+        }
+      };
+
+      if (Math.abs(currentVelocity) > 1) {
+        animate();
+      }
+    }
   };
 
   const handleMouseLeave = () => {
     if (isDragging) {
       setIsDragging(false);
       const container = scrollContainerRef.current;
-      if (container) container.style.cursor = 'grab';
+      if (container) {
+        container.style.cursor = "grab";
+        container.style.scrollBehavior = "smooth";
+
+        // Apply momentum on leave
+        let currentVelocity = velocity;
+        const friction = 0.95;
+
+        const animate = () => {
+          if (Math.abs(currentVelocity) > 0.5) {
+            currentVelocity *= friction;
+            container.scrollLeft -= currentVelocity;
+            animationRef.current = requestAnimationFrame(animate);
+          }
+        };
+
+        if (Math.abs(currentVelocity) > 1) {
+          animate();
+        }
+      }
     }
   };
 
@@ -109,49 +163,101 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-  (async () => {
-    try {
-      const [f, a] = await Promise.all([
-        client.fetch<Work[]>(FEATURED_WORKS),
-        client.fetch<Work[]>(ALL_WORKS),
-      ]);
-      console.log("Fetched works:", a); // ← EKLEME
-      console.log("Sample work:", a[0]); // ← EKLEME
-      setFeatured(f || []);
-      setAllWorks(a || []);
-    } catch (e) {
-      console.error("Sanity fetch error:", e);
-    }
-  })();
-}, []);
+    (async () => {
+      try {
+        const [f, a] = await Promise.all([
+          client.fetch<Work[]>(FEATURED_WORKS),
+          client.fetch<Work[]>(ALL_WORKS),
+        ]);
+        console.log("Fetched works:", a); // ← EKLEME
+        console.log("Sample work:", a[0]); // ← EKLEME
+        setFeatured(f || []);
+        setAllWorks(a || []);
+      } catch (e) {
+        console.error("Sanity fetch error:", e);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (selected || lightboxImages.length > 0) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+    }
+  }, [selected, lightboxImages]);
+
+  useEffect(() => {
+    if (selected || lightboxImages.length > 0) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [selected, lightboxImages]);
 
   useEffect(() => {
     if (lightboxImages.length === 0) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         prevImage();
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         nextImage();
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         closeLightbox();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxImages]);
+
+  // Scroll animation for work cards - triggers every time
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.getAttribute("data-work-id");
+          if (!id) return;
+
+          if (entry.isIntersecting) {
+            // Add to visible cards when in view
+            setVisibleCards((prev) => new Set(prev).add(id));
+          } else {
+            // Remove from visible cards when out of view
+            setVisibleCards((prev) => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+            });
+          }
+        });
+      },
+      { threshold: 0.2, rootMargin: "0px" }
+    );
+
+    workCardsRef.current.forEach((card) => {
+      if (card) observer.observe(card);
+    });
+
+    return () => observer.disconnect();
+  }, [allWorks]);
+
+  // Cleanup animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     if (filter === "all") return allWorks;
@@ -159,7 +265,7 @@ export default function HomePage() {
   }, [allWorks, filter]);
 
   const openLightbox = (images: any[], index: number) => {
-    const imageUrls = images.map(img => 
+    const imageUrls = images.map((img) =>
       urlFor(img).width(2400).quality(100).url()
     );
     setLightboxImages(imageUrls);
@@ -172,26 +278,31 @@ export default function HomePage() {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev < lightboxImages.length - 1 ? prev + 1 : 0));
+    setCurrentImageIndex((prev) =>
+      prev < lightboxImages.length - 1 ? prev + 1 : 0
+    );
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : lightboxImages.length - 1));
+    setCurrentImageIndex((prev) =>
+      prev > 0 ? prev - 1 : lightboxImages.length - 1
+    );
   };
 
-  const isModalScrollable = selected && selected.images && selected.images.length > 2;
-  
+  const isModalScrollable =
+    selected && selected.images && selected.images.length > 2;
+
   const [isAboutHovered, setIsAboutHovered] = useState(false);
   const lottieRef = useRef<any>(null);
 
   return (
     <div className="flex flex-col items-center bg-white text-black font-montserrat relative min-h-screen overflow-x-hidden">
-      <Link 
-        href="/about" 
+      <Link
+        href="/about"
         className={`fixed top-4 right-4 sm:top-6 sm:right-6 md:top-10 md:right-10 rounded-full bg-[#00B050] z-50 transition-all duration-500 cursor-pointer flex items-center justify-center shadow-lg overflow-hidden group ${
-          isAboutHovered 
-            ? 'w-[180px] h-14 sm:w-[220px] sm:h-16 md:w-[250px] md:h-[70px] pr-4' 
-            : 'w-14 h-14 sm:w-16 sm:h-16 md:w-[70px] md:h-[70px]'
+          isAboutHovered
+            ? "w-[180px] h-14 sm:w-[220px] sm:h-16 md:w-[250px] md:h-[70px] pr-4"
+            : "w-14 h-14 sm:w-16 sm:h-16 md:w-[70px] md:h-[70px]"
         }`}
         onMouseEnter={() => {
           setIsAboutHovered(true);
@@ -206,10 +317,14 @@ export default function HomePage() {
           }
         }}
       >
-        <div className={`flex-shrink-0 transition-all duration-500 ${
-          isAboutHovered ? 'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16' : 'w-[75%] h-[75%]'
-        }`}>
-          <Lottie 
+        <div
+          className={`flex-shrink-0 transition-all duration-500 ${
+            isAboutHovered
+              ? "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
+              : "w-[75%] h-[75%]"
+          }`}
+        >
+          <Lottie
             lottieRef={lottieRef}
             animationData={logoAnimation}
             loop={true}
@@ -217,49 +332,67 @@ export default function HomePage() {
             className="w-full h-full"
           />
         </div>
-        
-        <span className={`font-black text-[#003300] font-weight:900 text-sm sm:text-base md:text-lg whitespace-nowrap transition-all duration-500 ${
-          isAboutHovered 
-            ? 'opacity-100 translate-x-0 ml-3' 
-            : 'opacity-0 translate-x-[-20px] ml-0 w-0'
-        }`}>
+
+        <span
+          className={`font-black text-[#003300] font-weight:900 text-sm sm:text-base md:text-lg whitespace-nowrap transition-all duration-500 ${
+            isAboutHovered
+              ? "opacity-100 translate-x-0 ml-3"
+              : "opacity-0 translate-x-[-20px] ml-0 w-0"
+          }`}
+        >
           ABOUT ME
         </span>
       </Link>
 
-
-
       <section className="flex flex-col items-center text-center mt-20 sm:mt-24 md:mt-28 mb-12 sm:mb-16 px-4 w-full max-w-7xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tight text-[#191919]">
           ANIL EMMİLER
         </h1>
-        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4">
+        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 text-[#191919]">
           ISTANBUL BASED DESIGNER & ILLUSTRATOR
         </p>
-        <p className="mt-2 text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#00B050]">
+        <a
+          href="mailto:anilemmiler@gmail.com"
+          className="mt-2 text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#26a95a] hover:text-[#063F14] transition-colors duration-300"
+        >
           anilemmiler@gmail.com
-        </p>
+        </a>
       </section>
 
-      <section className="w-full mb-16 sm:mb-20 md:mb-24">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center mb-8 sm:mb-10 md:mb-12 px-4">
+      {/* 100px spacing */}
+      <div className="h-[100px]"></div>
+
+      <section className="w-full mb-[200px]">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center mb-12 px-4">
           FEATURED WORKS
         </h2>
 
-        <div 
+        <div
           ref={scrollContainerRef}
-          className="overflow-x-auto overflow-y-hidden px-4 sm:px-6 md:px-8 pb-6 cursor-grab select-none"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="overflow-x-auto overflow-y-hidden px-4 sm:px-6 md:px-8 pb-6 cursor-grab select-none transition-all duration-300"
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            scrollBehavior: "smooth",
+            WebkitOverflowScrolling: "touch",
+          }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
         >
-          <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
-          
+          <style jsx>{`
+            div::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
+
           <div className="flex gap-[100px] w-max">
             {featured.map((work) => (
-              <div key={work._id} className="flex flex-col items-center flex-shrink-0">
+              <div
+                key={work._id}
+                className="flex flex-col items-center flex-shrink-0"
+              >
                 <div className="w-[500px] h-[500px] rounded-3xl overflow-hidden shadow-lg pointer-events-none select-none">
                   {work.image ? (
                     <Image
@@ -272,12 +405,14 @@ export default function HomePage() {
                       draggable={false}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-200 grid place-items-center text-gray-500">No Image</div>
+                    <div className="w-full h-full bg-gray-200 grid place-items-center text-gray-500">
+                      No Image
+                    </div>
                   )}
                 </div>
                 <button
                   onClick={() => setSelected(work)}
-                  className="mt-4 px-6 py-2 bg-[#00B050] text-white rounded-full font-semibold hover:bg-[#00a046] transition pointer-events-auto"
+                  className="mt-4 px-6 py-2 bg-[#F8F8F8] text-[#191919] shadow rounded-full font-semibold hover:bg-[#F8F8F8] transition-transform duration-300 hover:scale-110"
                 >
                   {work.title}
                 </button>
@@ -288,13 +423,16 @@ export default function HomePage() {
       </section>
 
       <section className="w-full max-w-7xl mb-8 sm:mb-10 px-4 sm:px-6">
-        <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 justify-center">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
           {CATEGORIES.map((c) => (
             <button
               key={c.key}
               onClick={() => setFilter(c.key)}
-              className={`px-3 sm:px-4 md:px-6 py-2 md:py-3 rounded-full text-xs sm:text-sm md:text-base font-semibold transition whitespace-nowrap
-                ${filter === c.key ? "bg-[#27AE60] text-white shadow-md" : "bg-[#E6F5EC] text-[#1D4E2D] hover:bg-[#d8f0e4]"}`}
+              className={`px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base lg:text-lg font-bold rounded-full transition-all duration-300 ${
+                filter === c.key
+                  ? "bg-[#26a95a] text-[#063F14]"
+                  : "bg-[#8ad6a8] text-[#063F14] hover:bg-[#6FC491] hover:scale-105"
+              }`}
             >
               {c.label}
             </button>
@@ -304,17 +442,25 @@ export default function HomePage() {
 
       <section className="w-full max-w-7xl mb-16 sm:mb-20 md:mb-24 px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-16 lg:gap-[100px] justify-items-center">
-          {filtered.map((w) => (
-            <div 
-  key={w._id}
-  onClick={() => {
-    console.log("Selected work:", w); // ← EKLEME
-    console.log("Has image:", w.image); // ← EKLEME
-    console.log("Has images array:", w.images); // ← EKLEME
-    setSelected(w);
-  }}
-  className="w-[300px] h-[300px] rounded-2xl overflow-hidden bg-white shadow-lg cursor-pointer relative group transition-transform duration-300 hover:scale-105"
->
+          {filtered.map((w, index) => (
+            <div
+              key={w._id}
+              ref={(el) => {
+                workCardsRef.current[index] = el;
+              }}
+              data-work-id={w._id}
+              onClick={() => {
+                console.log("Selected work:", w);
+                console.log("Has image:", w.image);
+                console.log("Has images array:", w.images);
+                setSelected(w);
+              }}
+              className={`w-[300px] h-[300px] rounded-2xl overflow-hidden bg-white shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
+                visibleCards.has(w._id)
+                  ? "opacity-100 scale-100 translate-y-0"
+                  : "opacity-0 scale-90 translate-y-8"
+              }`}
+            >
               {w.image ? (
                 <>
                   <Image
@@ -322,16 +468,27 @@ export default function HomePage() {
                     alt={w.title}
                     width={300}
                     height={300}
-                    className="object-cover w-full h-full transition-all duration-300 group-hover:brightness-[0.35] group-hover:scale-110"
+                    className="object-cover w-full h-full transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="text-white text-lg sm:text-xl md:text-2xl font-bold text-center px-4">
+
+                  {/* Multiple Images Indicator */}
+                  {w.images && w.images.length > 1 && (
+                    <div className="absolute top-3 right-3 flex gap-1.5">
+                      <div className="w-[280px] h-[280px] bg-white/30 backdrop-blur-sm rounded-xl absolute top-2 right-2 -z-10 shadow-md" />
+                      <div className="w-[270px] h-[270px] bg-white/20 backdrop-blur-sm rounded-xl absolute top-4 right-4 -z-20 shadow-sm" />
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <h3 className="text-white text-lg sm:text-xl font-bold px-4 text-center">
                       {w.title}
                     </h3>
                   </div>
                 </>
               ) : (
-                <div className="w-full h-full bg-gray-200 grid place-items-center text-gray-500">No Image</div>
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400">No image</span>
+                </div>
               )}
             </div>
           ))}
@@ -339,73 +496,131 @@ export default function HomePage() {
       </section>
 
       <footer className="w-full bg-[#00B050] text-center py-12 sm:py-14 md:py-16 text-white mt-10 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">CONTACTS</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">
+          CONTACTS
+        </h2>
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-base sm:text-lg md:text-xl lg:text-2xl font-black">
-          <a href="#" className="hover:text-[#003300] hover:scale-110 transition-all duration-300">INSTAGRAM</a>
-          <a href="#" className="hover:text-[#003300] hover:scale-110 transition-all duration-300">DRIBBBLE</a>
-          <a href="#" className="hover:text-[#003300] hover:scale-110 transition-all duration-300">BEHANCE</a>
-          <a href="#" className="hover:text-[#003300] hover:scale-110 transition-all duration-300">SPOTIFY</a>
+          <a
+            href="https://www.instagram.com/anilemmiler?igsh=MWpkdDN3Z2V6cmh6OA%3D%3D&utm_source=qr"
+            className="hover:text-[#063F14] hover:scale-110 transition-all duration-300"
+          >
+            INSTAGRAM
+          </a>
+          <a
+            href="https://dribbble.com/anilemmiler"
+            className="hover:text-[#063F14] hover:scale-110 transition-all duration-300"
+          >
+            DRIBBBLE
+          </a>
+          <a
+            href="https://www.behance.net/anilemmiler"
+            className="hover:text-[#063F14] hover:scale-110 transition-all duration-300"
+          >
+            BEHANCE
+          </a>
+          <a
+            href="https://open.spotify.com/artist/02btoKVtot82NXrfZwnTUt?si=WjxjhlBcSF6e-ar25_Q6FQ"
+            className="hover:text-[#063F14] hover:scale-110 transition-all duration-300"
+          >
+            SPOTIFY
+          </a>
         </div>
-        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">© ANIL EMMİLER 2025</p>
+        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">
+          © ANIL EMMİLER 2026
+        </p>
       </footer>
 
       {/* WORK DETAIL MODAL */}
       {selected && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-[30px] invisible-scrollbar">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-[30px]">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSelected(null)}
           />
-          
-          <div className={`relative bg-white rounded-[24px] sm:rounded-[40px] shadow-2xl w-full h-full z-10 overflow-y-auto`}>
+
+          <div className="relative bg-white rounded-[24px] sm:rounded-[40px] shadow-2xl w-full max-w-[95vw] h-[90vh] z-10 overflow-hidden">
+            <style jsx global>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+              .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+              .custom-scrollbar::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #00b050;
+                border-radius: 10px;
+              }
+              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #00693a;
+              }
+              .custom-scrollbar {
+                scrollbar-width: thin;
+                scrollbar-color: #00b050 #f1f1f1;
+              }
+            `}</style>
+
             <button
               onClick={() => setSelected(null)}
-              className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center text-gray-500 hover:text-black text-3xl sm:text-4xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all"
+              className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-extralight hover:font-extralight text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
             >
               ×
             </button>
 
-            <div className="px-4 sm:px-8 md:px-12 lg:px-20 py-4 sm:py-6">
-              {/* Title & Description - Smaller, centered, higher */}
+            <div className="h-full overflow-y-auto px-4 sm:px-8 md:px-12 lg:px-20 py-4 sm:py-6 scrollbar-hide">
+              {/* Title & Description */}
               <div className="w-full flex flex-col items-center mb-6 sm:mb-8 pt-3 sm:pt-4">
                 <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-center px-4">
                   {selected.title}
                 </h3>
-                
+
                 {selected.description && (
                   <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-2 sm:mt-3 text-center leading-relaxed max-w-3xl px-4">
                     {selected.description}
                   </p>
                 )}
-
               </div>
 
-              {/* Single image - when no images array OR only one image */}
-              {((selected.image && (!selected.images || selected.images.length === 0)) || 
+              {/* Single image */}
+              {((selected.image &&
+                (!selected.images || selected.images.length === 0)) ||
                 (selected.images && selected.images.length === 1)) && (
-                <div className="w-full flex justify-center mb-12 sm:mb-20">
-                  <div 
-                    className="rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-lg cursor-pointer group w-full max-w-[280px] sm:max-w-[380px]"
+                <div className="w-full flex justify-center items-center">
+                  <div
+                    className="rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-lg cursor-pointer w-full max-w-[90vw] sm:max-w-[min(65vh,650px)] aspect-square"
                     onClick={() => {
-                      const imageToShow = selected.images && selected.images.length === 1 
-                        ? selected.images[0] 
-                        : selected.image;
+                      const imageToShow =
+                        selected.images && selected.images.length === 1
+                          ? selected.images[0]
+                          : selected.image;
                       if (imageToShow) {
                         openLightbox([imageToShow], 0);
                       }
                     }}
                   >
                     {(() => {
-                      const imageToShow = selected.images && selected.images.length === 1 
-                        ? selected.images[0] 
-                        : selected.image;
+                      const imageToShow =
+                        selected.images && selected.images.length === 1
+                          ? selected.images[0]
+                          : selected.image;
                       return imageToShow ? (
                         <Image
-                          src={urlFor(imageToShow).width(1200).height(1200).url()}
-                          alt={selected.title || 'Work image'}
+                          src={urlFor(imageToShow)
+                            .width(1200)
+                            .height(1200)
+                            .url()}
+                          alt={selected.title || "Work image"}
                           width={1200}
                           height={1200}
-                          className="object-contain w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover w-full h-full"
                           priority
                         />
                       ) : null;
@@ -414,18 +629,17 @@ export default function HomePage() {
                 </div>
               )}
 
-
-
-              {/* Two images - Horizontal scrollable on mobile, side by side on desktop */}
+              {/* Two images */}
               {selected.images && selected.images.length === 2 && (
                 <>
-                  {/* Mobile: Horizontal scroll - SAME SIZE */}
-                  <div className="sm:hidden w-full mb-12 overflow-x-auto pb-4">
-                    <div className="flex gap-4 w-max px-2">
+                  {/* Mobile: Horizontal scroll with peek */}
+                  <div className="sm:hidden w-full overflow-x-auto scrollbar-hide">
+                    <div className="flex gap-4 w-max pl-4 pr-4">
                       {selected.images.map((img: any, idx: number) => (
-                        <div 
-                          key={idx} 
-                          className="rounded-[24px] overflow-hidden shadow-lg cursor-pointer group w-[280px] flex-shrink-0"
+                        <div
+                          key={idx}
+                          className="rounded-[24px] overflow-hidden shadow-lg cursor-pointer aspect-square flex-shrink-0"
+                          style={{ width: "calc(90vw - 40px)" }}
                           onClick={() => openLightbox(selected.images!, idx)}
                         >
                           <Image
@@ -433,27 +647,28 @@ export default function HomePage() {
                             alt={`${selected.title} ${idx + 1}`}
                             width={900}
                             height={900}
-                            className="object-contain w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                            className="object-cover w-full h-full"
                           />
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Desktop: Side by side - HALF SIZE */}
-                  <div className="hidden sm:flex w-full justify-center items-center gap-6 mb-20">
+                  {/* Desktop: Side by side square, fit screen */}
+                  <div className="hidden sm:flex w-full justify-center items-center gap-6">
                     {selected.images.map((img: any, idx: number) => (
-                      <div 
-                        key={idx} 
-                        className="rounded-[32px] overflow-hidden shadow-lg cursor-pointer group w-full max-w-[300px]"
+                      <div
+                        key={idx}
+                        className="rounded-[32px] overflow-hidden shadow-lg cursor-pointer aspect-square"
+                        style={{ width: "min(calc(55vh), 500px)" }}
                         onClick={() => openLightbox(selected.images!, idx)}
                       >
                         <Image
-                          src={urlFor(img).width(450).height(450).url()}
+                          src={urlFor(img).width(800).height(800).url()}
                           alt={`${selected.title} ${idx + 1}`}
-                          width={450}
-                          height={450}
-                          className="object-contain w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                          width={800}
+                          height={800}
+                          className="object-cover w-full h-full"
                         />
                       </div>
                     ))}
@@ -461,47 +676,133 @@ export default function HomePage() {
                 </>
               )}
 
-              {/* Multiple images (3+) - Horizontal scroll on mobile, grid on desktop */}
+              {/* Multiple images (3+) */}
               {selected.images && selected.images.length > 2 && (
                 <>
-                  {/* Mobile: Horizontal scroll */}
-                  <div className="sm:hidden w-full mb-12 overflow-x-auto pb-4">
-                    <div className="flex gap-4 w-max px-2">
-                      {selected.images.map((img: any, idx: number) => (
-                        <div 
-                          key={idx} 
-                          className="rounded-[24px] overflow-hidden shadow-lg cursor-pointer group w-[280px] flex-shrink-0"
-                          onClick={() => openLightbox(selected.images!, idx)}
-                        >
-                          <Image
-                            src={urlFor(img).width(900).height(900).url()}
-                            alt={`${selected.title} ${idx + 1}`}
-                            width={900}
-                            height={900}
-                            className="object-contain w-full h-auto group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                  {/* Mobile: Alternating grid (2-1-2-1 pattern) */}
+                  <div className="sm:hidden w-full space-y-4 px-4">
+                    {selected.images.map((img: any, idx: number) => {
+                      const position = idx % 3;
+
+                      if (position === 0 || position === 1) {
+                        // First two of every three: side by side
+                        if (idx === 0 || idx % 3 === 0) {
+                          return (
+                            <div
+                              key={`row-${idx}`}
+                              className="grid grid-cols-2 gap-4"
+                            >
+                              {selected.images
+                                ?.slice(idx, idx + 2)
+                                .map((img: any, subIdx: number) => (
+                                  <div
+                                    key={idx + subIdx}
+                                    className="rounded-[20px] overflow-hidden shadow-lg cursor-pointer aspect-square"
+                                    onClick={() =>
+                                      openLightbox(
+                                        selected.images!,
+                                        idx + subIdx
+                                      )
+                                    }
+                                  >
+                                    <Image
+                                      src={urlFor(img)
+                                        .width(500)
+                                        .height(500)
+                                        .url()}
+                                      alt={`${selected.title} ${idx + subIdx + 1}`}
+                                      width={500}
+                                      height={500}
+                                      className="object-cover w-full h-full"
+                                    />
+                                  </div>
+                                ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      } else {
+                        // Third of every three: full width
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-[20px] overflow-hidden shadow-lg cursor-pointer aspect-[16/9] w-full"
+                            onClick={() => openLightbox(selected.images!, idx)}
+                          >
+                            <Image
+                              src={urlFor(img).width(900).height(506).url()}
+                              alt={`${selected.title} ${idx + 1}`}
+                              width={900}
+                              height={506}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        );
+                      }
+                    })}
                   </div>
 
-                  {/* Desktop: Grid layout */}
-                  <div className="hidden sm:grid grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto mb-20">
-                    {selected.images.map((img: any, idx: number) => (
-                      <div 
-                        key={idx} 
-                        className="rounded-[32px] overflow-hidden shadow-lg cursor-pointer group w-full max-w-[300px]"
-                        onClick={() => openLightbox(selected.images!, idx)}
-                      >
-                        <Image
-                          src={urlFor(img).width(450).height(450).url()}
-                          alt={`${selected.title} ${idx + 1}`}
-                          width={450}
-                          height={450}
-                          className="object-contain w-full h-auto group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ))}
+                  {/* Desktop: Alternating grid (2-1-2-1 pattern) */}
+                  <div className="hidden sm:block w-full space-y-6 max-w-5xl mx-auto">
+                    {selected.images?.map((img: any, idx: number) => {
+                      const position = idx % 3;
+
+                      if (position === 0 || position === 1) {
+                        // First two of every three: side by side
+                        if (idx === 0 || idx % 3 === 0) {
+                          return (
+                            <div
+                              key={`row-${idx}`}
+                              className="grid grid-cols-2 gap-6"
+                            >
+                              {selected.images
+                                ?.slice(idx, idx + 2)
+                                .map((img: any, subIdx: number) => (
+                                  <div
+                                    key={idx + subIdx}
+                                    className="rounded-[32px] overflow-hidden shadow-lg cursor-pointer aspect-square"
+                                    onClick={() =>
+                                      openLightbox(
+                                        selected.images!,
+                                        idx + subIdx
+                                      )
+                                    }
+                                  >
+                                    <Image
+                                      src={urlFor(img)
+                                        .width(800)
+                                        .height(800)
+                                        .url()}
+                                      alt={`${selected.title} ${idx + subIdx + 1}`}
+                                      width={800}
+                                      height={800}
+                                      className="object-cover w-full h-full"
+                                    />
+                                  </div>
+                                ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      } else {
+                        // Third of every three: full width
+                        return (
+                          <div
+                            key={idx}
+                            className="rounded-[32px] overflow-hidden shadow-lg cursor-pointer aspect-[16/9] w-full"
+                            onClick={() => openLightbox(selected.images!, idx)}
+                          >
+                            <Image
+                              src={urlFor(img).width(1400).height(788).url()}
+                              alt={`${selected.title} ${idx + 1}`}
+                              width={1400}
+                              height={788}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        );
+                      }
+                    })}
                   </div>
                 </>
               )}
@@ -524,30 +825,33 @@ export default function HomePage() {
             {/* Close Button - Over images */}
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-gray-500 hover:text-black text-3xl sm:text-4xl leading-none z-30 bg-white/90 hover:bg-white rounded-full transition-all shadow-lg"
+              className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-light hover:font-light text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
             >
               ×
             </button>
 
-            
             {/* Scrollable Images Container */}
             <div className="relative w-full h-full overflow-hidden">
               <div
                 ref={lightboxScrollRef}
                 className="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing px-6 sm:px-8 py-6 sm:py-8"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 onMouseDown={handleLightboxMouseDown}
                 onMouseMove={handleLightboxMouseMove}
                 onMouseUp={handleLightboxMouseUp}
                 onMouseLeave={handleLightboxMouseLeave}
               >
-                <style jsx>{`div::-webkit-scrollbar { display: none; }`}</style>
+                <style jsx>{`
+                  div::-webkit-scrollbar {
+                    display: none;
+                  }
+                `}</style>
                 <div className="flex gap-4 sm:gap-6 h-full w-max items-center">
                   {lightboxImages.map((img, idx) => (
                     <div
                       key={idx}
                       className="flex-shrink-0 flex items-center justify-center"
-                      style={{ height: 'calc(90vh - 3rem)' }}
+                      style={{ height: "calc(90vh - 3rem)" }}
                     >
                       <div className="rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-lg bg-gray-50">
                         <Image
@@ -556,7 +860,7 @@ export default function HomePage() {
                           width={1200}
                           height={1200}
                           className="object-contain w-auto select-none"
-                          style={{ height: 'calc(90vh - 4rem)' }}
+                          style={{ height: "calc(90vh - 4rem)" }}
                           priority
                           draggable={false}
                         />
@@ -565,8 +869,6 @@ export default function HomePage() {
                   ))}
                 </div>
               </div>
-
-              
             </div>
           </div>
         </div>

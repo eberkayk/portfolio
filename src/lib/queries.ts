@@ -21,6 +21,7 @@ export const ABOUT_PAGE = `
       school,
       degree,
       duration,
+      degreeType,
       gpa,
       logo
     }

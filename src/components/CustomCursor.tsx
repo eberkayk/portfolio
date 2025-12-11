@@ -1,61 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function CustomCursor() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
-  // mouse konumu
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // smooth hareket (yaylı)
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 40 });
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 40 });
-
   useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
+    const updatePosition = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
     };
 
-    // hover algılama
-    const hoverTargets = document.querySelectorAll("button, a, img, .magnetic");
-    hoverTargets.forEach((el) => {
-      el.addEventListener("mouseenter", () => setIsHovering(true));
-      el.addEventListener("mouseleave", () => setIsHovering(false));
-    });
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "A" ||
+        target.tagName === "BUTTON" ||
+        target.closest("a") ||
+        target.closest("button") ||
+        target.classList.contains("cursor-pointer")
+      ) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
 
-    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("mousemove", updatePosition);
+    window.addEventListener("mouseover", handleMouseOver);
+
     return () => {
-      window.removeEventListener("mousemove", moveCursor);
-      hoverTargets.forEach((el) => {
-        el.removeEventListener("mouseenter", () => setIsHovering(true));
-        el.removeEventListener("mouseleave", () => setIsHovering(false));
-      });
+      window.removeEventListener("mousemove", updatePosition);
+      window.removeEventListener("mouseover", handleMouseOver);
     };
-  }, [mouseX, mouseY]);
+  }, []);
 
   return (
-    <motion.div
-      style={{
-        x: springX,
-        y: springY,
-        translateX: "-50%", // 👈 fare merkezine hizalama
-        translateY: "-50%", // 👈 fare merkezine hizalama
-      }}
-      className="pointer-events-none fixed top-0 left-0 z-[9999] mix-blend-difference"
-    >
-      <motion.div
-        animate={{
-          width: isHovering ? 60 : 24,
-          height: isHovering ? 60 : 24,
-          opacity: 1,
+    <>
+      {/* Main cursor */}
+      <div
+        className="fixed top-0 left-0 pointer-events-none z-[9999] transition-transform duration-100 ease-out"
+        style={{
+          transform: `translate(${position.x - 6}px, ${position.y - 6}px) scale(${isHovering ? 1.5 : 1})`,
         }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="rounded-full bg-[#00B050]"
-      />
-    </motion.div>
+      >
+        <div className="w-3 h-3 rounded-full bg-[#00B050] opacity-80" />
+      </div>
+
+      {/* Trailing cursor */}
+      <div
+        className="fixed top-0 left-0 pointer-events-none z-[9998] transition-all duration-300 ease-out"
+        style={{
+          transform: `translate(${position.x - 16}px, ${position.y - 16}px) scale(${isHovering ? 2 : 1})`,
+        }}
+      >
+        <div className="w-8 h-8 rounded-full border-2 border-[#00B050] opacity-30" />
+      </div>
+    </>
   );
 }

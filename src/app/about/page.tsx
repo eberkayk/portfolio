@@ -28,6 +28,7 @@ type About = {
     school: string;
     degree: string;
     duration: string;
+    degreeType?: string;
     gpa?: string;
     logo?: any;
   }>;
@@ -48,86 +49,91 @@ export default function AboutPage() {
     })();
   }, []);
 
-  if (!data) return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  if (!data)
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
 
   return (
     <div className="w-full min-h-screen bg-white overflow-x-hidden">
-      {/* Home Button - Yeşil Daire + Siyah Çarpı */}
-      <Link 
+      <Link
         href="/"
-        className="fixed top-4 right-4 sm:top-6 sm:right-6 md:top-10 md:right-10 w-12 h-12 sm:w-14 sm:h-14 md:w-[60px] md:h-[60px] rounded-full bg-[#00B050] z-40 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 cursor-pointer group"
+        className="fixed top-4 right-4 sm:top-6 sm:right-6 md:top-10 md:right-10 w-14 h-14 sm:w-16 sm:h-16 md:w-[70px] md:h-[70px] rounded-full bg-[#00B050] z-50 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300"
       >
-        <span className="text-black text-2xl sm:text-3xl md:text-4xl font-light leading-none group-hover:rotate-90 transition-transform duration-300">
+        <span className="text-black text-3xl sm:text-4xl md:text-5xl font-light leading-none hover:rotate-90 transition-transform duration-300">
           ×
         </span>
       </Link>
-      
-      {/* Main content */}
-      <div className="max-w-[820px] mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-28 pb-0">
-        
-        {/* Profile section */}
-        <div className="flex flex-col items-center mb-12 sm:mb-14 md:mb-16">
-          <div className="w-[260px] h-[260px] rounded-2xl sm:rounded-[20px] overflow-hidden mb-4 sm:mb-6 bg-gray-200 shadow-md">
-            {data.profileImage ? (
-              <Image
-                src={urlFor(data.profileImage).width(260).height(260).url()}
-                alt={data.name || "Profile"}
-                width={260}
-                height={260}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 grid place-items-center">
-                <span className="text-4xl">👤</span>
-              </div>
-            )}
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide text-center">
-            {data.name || "ANIL EMMİLER"}
-          </h1>
-          <p className="mt-2 text-[10px] sm:text-[11px] md:text-xs uppercase tracking-[.18em] opacity-70 text-center px-4">
-            {data.title || "ISTANBUL BASED DESIGNER & ILLUSTRATOR"}
-          </p>
-          <p className="mt-2 text-sm sm:text-[15px] md:text-[17px] font-semibold text-[#00B050] text-center break-all px-4">
-            {data.email || "anilemmiler@gmail.com"}
-          </p>
-        </div>
 
-        {/* Things I Do */}
+      {/* Profile Image */}
+      <div className="flex justify-center mt-20 sm:mt-24 md:mt-28 mb-8 sm:mb-10">
+        <div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[260px] md:h-[260px] rounded-2xl overflow-hidden shadow-lg">
+          {data.profileImage ? (
+            <Image
+              src={urlFor(data.profileImage).width(260).height(260).url()}
+              alt={data.name || "Profile"}
+              width={260}
+              height={260}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 grid place-items-center">
+              <span className="text-4xl">👤</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <section className="flex flex-col items-center text-center mb-[100px] px-4 w-full max-w-7xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-none tracking-tight text-[#191919]">
+          {data.name || "ANIL EMMİLER"}
+        </h1>
+        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4">
+          {data.title || "ISTANBUL BASED DESIGNER & ILLUSTRATOR"}
+        </p>
+        <a
+          href={`mailto:${data.email || "anilemmiler@gmail.com"}`}
+          className="mt-2 text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#26a95a] hover:text-[#063F14] transition-colors duration-300"
+        >
+          {data.email || "anilemmiler@gmail.com"}
+        </a>
+      </section>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
         {data.thingsIDo && data.thingsIDo.length > 0 && (
-          <div className="mb-10 sm:mb-12">
-            <h2 className="text-[17px] sm:text-[19px] md:text-xl font-bold mb-3 sm:mb-4 uppercase tracking-wider text-center">
+          <div className="mb-16 sm:mb-20">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
               THINGS I DO
             </h2>
-            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
               {data.thingsIDo.map((thing, i) => (
-                <span
+                <div
                   key={i}
-                  className="px-4 py-2 bg-[#f8f8f8] text-black text-xs sm:text-sm md:text-base font-medium rounded-2xl"
+                  className="px-4 bg-[#F8F8F8] text-black text-sm sm:text-base md:text-lg font-medium rounded-[16px] flex items-center justify-center"
+                  style={{ height: "60px" }}
                 >
-                  {thing}
-                </span>
+                  <span>{thing}</span>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Tools I Use */}
         {data.toolsIUse && data.toolsIUse.length > 0 && (
-          <div className="mb-10 sm:mb-12">
-            <h2 className="text-[17px] sm:text-[19px] md:text-xl font-bold mb-3 sm:mb-4 uppercase tracking-wider text-center">
+          <div className="mb-16 sm:mb-20">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
               TOOLS I USE
             </h2>
-            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+            <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
               {data.toolsIUse
-                .filter(tool => tool && tool.name)
+                .filter((tool) => tool && tool.name)
                 .map((tool, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#f8f8f8] text-black text-xs sm:text-sm md:text-base font-medium rounded-2xl"
+                    className="flex items-center gap-2 pr-4 bg-[#F8F8F8] text-black text-sm sm:text-base md:text-lg font-medium rounded-[16px]"
+                    style={{ height: "60px" }}
                   >
                     {tool.logo && (
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden flex-shrink-0 ml-2">
                         <Image
                           src={urlFor(tool.logo).width(80).height(80).url()}
                           alt={tool.name}
@@ -144,61 +150,61 @@ export default function AboutPage() {
           </div>
         )}
 
-        {/* Experience */}
         {data.experience && data.experience.length > 0 && (
-          <div className="mb-10 sm:mb-12">
-            <h2 className="text-[17px] sm:text-[19px] md:text-xl font-bold mb-4 sm:mb-5 uppercase tracking-wider">
+          <div className="mb-16 sm:mb-20">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
               EXPERIENCE
             </h2>
-            <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-6 sm:space-y-8">
               {data.experience.map((exp, i) => (
                 <div
                   key={i}
-                  className="bg-[#F5F5F5] rounded-[24px] sm:rounded-[40px] p-4 sm:p-6 flex flex-col sm:flex-row gap-3 sm:gap-5"
+                  className="flex flex-row items-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-6 md:p-8 bg-[#F8F8F8] rounded-[24px] sm:rounded-[32px] md:rounded-[40px]"
                 >
-                  {/* Logo */}
                   {exp.logo && (
-                    <div className="w-[120px] h-[120px] sm:w-[200px] sm:h-[200px] rounded-[16px] sm:rounded-[24px] overflow-hidden flex-shrink-0 bg-white shadow-sm mx-auto sm:mx-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-[12px] sm:rounded-[14px] md:rounded-[16px] overflow-hidden flex-shrink-0">
                       <Image
                         src={urlFor(exp.logo).width(200).height(200).url()}
                         alt={exp.company}
                         width={200}
                         height={200}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   )}
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-2 mb-2">
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold leading-tight">
-                        {exp.role}
-                      </h3>
+
+                  <div className="flex-1 min-w-0 flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    <div className="flex-1 min-w-0">
                       {exp.current && (
-                        <span className="px-2 py-1 bg-[#00B050] text-white text-[10px] sm:text-xs font-semibold rounded-full whitespace-nowrap flex-shrink-0">
-                          Current
+                        <span className="inline-block mb-2 px-3 py-1 text-[10px] sm:text-xs font-semibold bg-[#00B050] text-white rounded-full uppercase">
+                          Current Role
                         </span>
                       )}
+                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 break-words">
+                        {exp.role}
+                      </h3>
+                      <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-1 font-medium break-words">
+                        {exp.company}
+                      </p>
+                      <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
+                        {exp.duration}
+                      </p>
                     </div>
-                    <p className="text-sm sm:text-base font-semibold text-gray-700 mb-1">
-                      {exp.company}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
-                      {exp.duration}
-                    </p>
+
                     {exp.tasks && exp.tasks.length > 0 && (
-                      <ul className="space-y-1.5 sm:space-y-2">
-                        {exp.tasks.map((task, j) => (
-                          <li
-                            key={j}
-                            className="text-xs sm:text-sm text-gray-700 flex items-start gap-2"
-                          >
-                            <span className="text-[#00B050] mt-1 flex-shrink-0">•</span>
-                            <span className="flex-1">{task}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="flex-1 sm:flex-[1.2] min-w-0">
+                        <ul className="space-y-1.5 text-xs sm:text-sm md:text-base text-gray-700">
+                          {exp.tasks.map((task, idx) => (
+                            <li
+                              key={idx}
+                              className="flex items-start break-words"
+                            >
+                              <span className="mr-2 flex-shrink-0">•</span>
+                              <span className="flex-1">{task}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -207,47 +213,58 @@ export default function AboutPage() {
           </div>
         )}
 
-        {/* Education */}
         {data.education && data.education.length > 0 && (
-          <div className="mb-10 sm:mb-12">
-            <h2 className="text-[17px] sm:text-[19px] md:text-xl font-bold mb-4 sm:mb-5 uppercase tracking-wider">
+          <div className="mb-16 sm:mb-20">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
               EDUCATION
             </h2>
-            <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-6 sm:space-y-8">
               {data.education.map((edu, i) => (
                 <div
                   key={i}
-                  className="bg-[#F5F5F5] rounded-[24px] sm:rounded-[40px] p-4 sm:p-6 flex flex-col sm:flex-row gap-3 sm:gap-5"
+                  className="flex flex-row items-start gap-4 sm:gap-6 md:gap-8 p-4 sm:p-6 md:p-8 bg-[#F8F8F8] rounded-[24px] sm:rounded-[32px] md:rounded-[40px]"
                 >
-                  {/* Logo */}
+                  {/* Logo - Sol */}
                   {edu.logo && (
-                    <div className="w-[120px] h-[120px] sm:w-[200px] sm:h-[200px] rounded-[16px] sm:rounded-[24px] overflow-hidden flex-shrink-0 bg-white shadow-sm mx-auto sm:mx-0">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-[12px] sm:rounded-[14px] md:rounded-[16px] overflow-hidden flex-shrink-0">
                       <Image
                         src={urlFor(edu.logo).width(200).height(200).url()}
                         alt={edu.school}
                         width={200}
                         height={200}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                   )}
-                  
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg md:text-xl font-bold leading-tight mb-2">
-                      {edu.degree}
-                    </h3>
-                    <p className="text-sm sm:text-base font-semibold text-gray-700 mb-1">
-                      {edu.school}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500 mb-2">
-                      {edu.duration}
-                    </p>
-                    {edu.gpa && (
-                      <p className="text-xs sm:text-sm font-semibold text-[#00B050]">
-                        GPA: {edu.gpa}
+
+                  {/* Content Wrapper */}
+                  <div className="flex-1 min-w-0 flex flex-col sm:flex-row gap-4 sm:gap-6">
+                    {/* Orta - Degree, School, Duration */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-2 break-words">
+                        {edu.degree}
+                      </h3>
+                      <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mb-1 break-words">
+                        {edu.school}
                       </p>
-                    )}
+                      <p className="text-xs sm:text-sm md:text-base text-gray-500">
+                        {edu.duration}
+                      </p>
+                    </div>
+
+                    {/* Sağ - Degree Type & GPA */}
+                    <div className="flex-1 sm:flex-[0.8] min-w-0">
+                      {edu.degreeType && (
+                        <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-1">
+                          {edu.degreeType}
+                        </p>
+                      )}
+                      {edu.gpa && (
+                        <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">
+                          {edu.gpa}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -256,16 +273,39 @@ export default function AboutPage() {
         )}
       </div>
 
-      {/* FOOTER */}
-      <footer className="w-full bg-[#00B050] text-center py-12 sm:py-14 md:py-16 text-white mt-10 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">CONTACTS</h2>
+      <footer className="w-full bg-[#00B050] text-center py-12 sm:py-14 md:py-16 text-white px-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">
+          CONTACTS
+        </h2>
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-base sm:text-lg md:text-xl lg:text-2xl font-black">
-          <a href="#" className="hover:text-[#00693a] hover:scale-110 transition-all duration-300">INSTAGRAM</a>
-          <a href="#" className="hover:text-[#00693a] hover:scale-110 transition-all duration-300">DRIBBBLE</a>
-          <a href="#" className="hover:text-[#00693a] hover:scale-110 transition-all duration-300">BEHANCE</a>
-          <a href="#" className="hover:text-[#00693a] hover:scale-110 transition-all duration-300">SPOTIFY</a>
+          <a
+            href="https://www.instagram.com/anilemmiler?igsh=MWpkdDN3Z2V6cmh6OA%3D%3D&utm_source=qr"
+            className="hover:text-[#00693a] hover:scale-105 transition-all duration-300"
+          >
+            INSTAGRAM
+          </a>
+          <a
+            href="https://dribbble.com/anilemmiler"
+            className="hover:text-[#00693a] hover:scale-105 transition-all duration-300"
+          >
+            DRIBBBLE
+          </a>
+          <a
+            href="https://www.behance.net/anilemmiler"
+            className="hover:text-[#00693a] hover:scale-105 transition-all duration-300"
+          >
+            BEHANCE
+          </a>
+          <a
+            href="https://open.spotify.com/artist/02btoKVtot82NXrfZwnTUt?si=WjxjhlBcSF6e-ar25_Q6FQ"
+            className="hover:text-[#00693a] hover:scale-105 transition-all duration-300"
+          >
+            SPOTIFY
+          </a>
         </div>
-        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">© ANIL EMMİLER 2025</p>
+        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">
+          © ANIL EMMİLER 2026
+        </p>
       </footer>
     </div>
   );
