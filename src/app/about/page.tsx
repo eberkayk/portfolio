@@ -58,7 +58,7 @@ export default function AboutPage() {
         href="/"
         className="fixed top-4 right-4 sm:top-6 sm:right-6 md:top-10 md:right-10 w-14 h-14 sm:w-16 sm:h-16 md:w-[70px] md:h-[70px] rounded-full bg-[#00B050] z-50 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300"
       >
-        <span className="text-black text-3xl sm:text-4xl md:text-5xl font-light leading-none hover:rotate-90 transition-transform duration-300">
+        <span className="text-[#191919] text-6xl sm:text-7xl md:text-8xl font-extralight leading-none hover:rotate-90 transition-transform duration-300">
           ×
         </span>
       </Link>
@@ -87,7 +87,7 @@ export default function AboutPage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-none tracking-tight text-[#191919]">
           {data.name || "ANIL EMMİLER"}
         </h1>
-        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4">
+        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 text-[#191919]">
           {data.title || "ISTANBUL BASED DESIGNER & ILLUSTRATOR"}
         </p>
         <a
@@ -101,14 +101,14 @@ export default function AboutPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
         {data.thingsIDo && data.thingsIDo.length > 0 && (
           <div className="mb-16 sm:mb-20">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center text-[#191919]">
               THINGS I DO
             </h2>
             <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
               {data.thingsIDo.map((thing, i) => (
                 <div
                   key={i}
-                  className="px-4 bg-[#F8F8F8] text-black text-sm sm:text-base md:text-lg font-medium rounded-[16px] flex items-center justify-center"
+                  className="px-4 bg-[#F8F8F8] text-[#191919] text-sm sm:text-base md:text-lg font-medium rounded-[16px] flex items-center justify-center"
                   style={{ height: "60px" }}
                 >
                   <span>{thing}</span>
@@ -120,7 +120,7 @@ export default function AboutPage() {
 
         {data.toolsIUse && data.toolsIUse.length > 0 && (
           <div className="mb-16 sm:mb-20">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center text-[#191919]">
               TOOLS I USE
             </h2>
             <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
@@ -129,7 +129,7 @@ export default function AboutPage() {
                 .map((tool, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 pr-4 bg-[#F8F8F8] text-black text-sm sm:text-base md:text-lg font-medium rounded-[16px]"
+                    className="flex items-center gap-2 pr-4 bg-[#F8F8F8] text-[#191919] text-sm sm:text-base md:text-lg font-medium rounded-[16px]"
                     style={{ height: "60px" }}
                   >
                     {tool.logo && (
@@ -152,7 +152,7 @@ export default function AboutPage() {
 
         {data.experience && data.experience.length > 0 && (
           <div className="mb-16 sm:mb-20">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center text-[#191919]">
               EXPERIENCE
             </h2>
             <div className="space-y-6 sm:space-y-8">
@@ -180,7 +180,7 @@ export default function AboutPage() {
                           Current Role
                         </span>
                       )}
-                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-900 break-words">
+                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#191919] break-words">
                         {exp.role}
                       </h3>
                       <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-1 font-medium break-words">
@@ -215,7 +215,7 @@ export default function AboutPage() {
 
         {data.education && data.education.length > 0 && (
           <div className="mb-16 sm:mb-20">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 sm:mb-8 uppercase tracking-wider text-center text-[#191919]">
               EDUCATION
             </h2>
             <div className="space-y-6 sm:space-y-8">
@@ -241,7 +241,7 @@ export default function AboutPage() {
                   <div className="flex-1 min-w-0 flex flex-col sm:flex-row gap-4 sm:gap-6">
                     {/* Orta - Degree, School, Duration */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-2 break-words">
+                      <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-2 break-words text-[#191919]">
                         {edu.degree}
                       </h3>
                       <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mb-1 break-words">
@@ -274,7 +274,7 @@ export default function AboutPage() {
       </div>
 
       <footer className="w-full bg-[#00B050] text-center py-12 sm:py-14 md:py-16 text-white px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-[#191919]">
           CONTACTS
         </h2>
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-base sm:text-lg md:text-xl lg:text-2xl font-black">
@@ -303,7 +303,7 @@ export default function AboutPage() {
             SPOTIFY
           </a>
         </div>
-        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">
+        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-[#191919]">
           © ANIL EMMİLER 2026
         </p>
       </footer>

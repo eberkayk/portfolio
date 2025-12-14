@@ -1,3 +1,4 @@
+import { option } from 'framer-motion/client'
 import { defineType, defineField } from 'sanity'
 
 export default defineType({
@@ -27,8 +28,7 @@ export default defineType({
       type: 'image',
       options: {
         hotspot: true,
-      },
-      validation: (Rule: any) => Rule.required(),
+      }
     }),
     defineField({
       name: 'images',
@@ -48,6 +48,14 @@ export default defineType({
         ],
       },
       validation: (Rule: any) => Rule.required(),
+    }),
+    defineField({
+      name: 'video',
+      title: 'Video',
+      type: 'file',
+      options: {
+        accept: 'video/*',
+      },
     }),
     defineField({
       name: 'featured',

@@ -36,6 +36,7 @@ export const FEATURED_WORKS = `
     category,
     featured,
     image,
+   "video": video.asset->url,
     description,
     images,
     createdAt
@@ -50,6 +51,7 @@ export const ALL_WORKS = `
     category,
     featured,
     image,
+    "video": video.asset->url,
     description,
     images,
     createdAt

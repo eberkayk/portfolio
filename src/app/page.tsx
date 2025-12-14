@@ -16,7 +16,8 @@ type Work = {
   slug?: string;
   category: "illustration" | "ui/ux" | "music" | string;
   featured?: boolean;
-  image: any;
+  image?: any;
+  video?: string;
   description?: string;
   images?: any[];
   createdAt?: string;
@@ -181,25 +182,22 @@ export default function HomePage() {
 
   useEffect(() => {
     if (selected || lightboxImages.length > 0) {
+      // Scroll pozisyonunu kaydet
+      const scrollY = window.scrollY;
       document.body.style.overflow = "hidden";
+      document.body.style.top = `-${scrollY}px`;
       document.body.style.position = "fixed";
       document.body.style.width = "100%";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-    }
-  }, [selected, lightboxImages]);
 
-  useEffect(() => {
-    if (selected || lightboxImages.length > 0) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+      // Cleanup: Scroll pozisyonunu geri yükle
+      return () => {
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [selected, lightboxImages]);
 
   useEffect(() => {
@@ -363,7 +361,7 @@ export default function HomePage() {
       <div className="h-[100px]"></div>
 
       <section className="w-full mb-[200px]">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-center mb-12 px-4">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#191919] text-center mb-12 px-4">
           FEATURED WORKS
         </h2>
 
@@ -394,15 +392,22 @@ export default function HomePage() {
                 className="flex flex-col items-center flex-shrink-0"
               >
                 <div className="w-[500px] h-[500px] rounded-3xl overflow-hidden shadow-lg pointer-events-none select-none">
-                  {work.image ? (
+                  {work.video ? (
+                    <video
+                      src={work.video}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="object-cover w-full h-full"
+                    />
+                  ) : work.image ? (
                     <Image
                       src={urlFor(work.image).width(500).height(500).url()}
                       alt={work.title}
                       width={500}
                       height={500}
-                      className="object-cover w-full h-full"
-                      priority
-                      draggable={false}
+                      className="object-cover w-full h-full pointer-events-none"
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-200 grid place-items-center text-gray-500">
@@ -412,7 +417,7 @@ export default function HomePage() {
                 </div>
                 <button
                   onClick={() => setSelected(work)}
-                  className="mt-4 px-6 py-2 bg-[#F8F8F8] text-[#191919] shadow rounded-full font-semibold hover:bg-[#F8F8F8] transition-transform duration-300 hover:scale-110"
+                  className="mt-4 px-6 py-2 bg-[#F8F8F8] text-[#191919] shadow-sm rounded-full font-semibold hover:bg-[#F8F8F8] transition-transform duration-300 hover:scale-110"
                 >
                   {work.title}
                 </button>
@@ -451,52 +456,123 @@ export default function HomePage() {
               data-work-id={w._id}
               onClick={() => {
                 console.log("Selected work:", w);
-                console.log("Has image:", w.image);
-                console.log("Has images array:", w.images);
                 setSelected(w);
               }}
-              className={`w-[300px] h-[300px] rounded-2xl overflow-hidden bg-white shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
+              className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
                 visibleCards.has(w._id)
                   ? "opacity-100 scale-100 translate-y-0"
                   : "opacity-0 scale-90 translate-y-8"
               }`}
             >
-              {w.image ? (
+              {/* Stack Effect - Show actual images if multiple */}
+              {w.images && w.images.length >= 3 && (
                 <>
-                  <Image
-                    src={urlFor(w.image).width(300).height(300).url()}
-                    alt={w.title}
-                    width={300}
-                    height={300}
-                    className="object-cover w-full h-full transition-transform duration-300"
-                  />
+                  {/* Third layer (3rd image) */}
+                  <div
+                    className="absolute top-0 left-0 w-[300px] h-[300px] rounded-2xl shadow-md overflow-hidden"
+                    style={{
+                      transform: "translate(16px, 16px)",
+                      zIndex: 1,
+                    }}
+                  >
+                    <Image
+                      src={urlFor(w.images[2]).width(300).height(300).url()}
+                      alt=""
+                      width={300}
+                      height={300}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
 
-                  {/* Multiple Images Indicator */}
-                  {w.images && w.images.length > 1 && (
-                    <div className="absolute top-3 right-3 flex gap-1.5">
-                      <div className="w-[280px] h-[280px] bg-white/30 backdrop-blur-sm rounded-xl absolute top-2 right-2 -z-10 shadow-md" />
-                      <div className="w-[270px] h-[270px] bg-white/20 backdrop-blur-sm rounded-xl absolute top-4 right-4 -z-20 shadow-sm" />
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <h3 className="text-white text-lg sm:text-xl font-bold px-4 text-center">
-                      {w.title}
-                    </h3>
+                  {/* Second layer (2nd image) */}
+                  <div
+                    className="absolute top-0 left-0 w-[300px] h-[300px] rounded-2xl shadow-lg overflow-hidden"
+                    style={{
+                      transform: "translate(8px, 8px)",
+                      zIndex: 2,
+                    }}
+                  >
+                    <Image
+                      src={urlFor(w.images[1]).width(300).height(300).url()}
+                      alt=""
+                      width={300}
+                      height={300}
+                      className="object-cover w-full h-full"
+                    />
                   </div>
                 </>
-              ) : (
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400">No image</span>
-                </div>
               )}
+
+              {w.images && w.images.length === 2 && (
+                <>
+                  {/* Second layer (2nd image) */}
+                  <div
+                    className="absolute top-0 left-0 w-[300px] h-[300px] rounded-2xl shadow-lg overflow-hidden"
+                    style={{
+                      transform: "translate(8px, 8px)",
+                      zIndex: 2,
+                    }}
+                  >
+                    <Image
+                      src={urlFor(w.images[1]).width(300).height(300).url()}
+                      alt=""
+                      width={300}
+                      height={300}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Main image container (1st image or cover) */}
+              <div
+                className="relative w-full h-full rounded-2xl overflow-hidden bg-white"
+                style={{ zIndex: 3 }}
+              >
+                {w.video ? (
+                  <>
+                    <video
+                      src={w.video}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <h3 className="text-white text-lg sm:text-xl font-bold px-4 text-center">
+                        {w.title}
+                      </h3>
+                    </div>
+                  </>
+                ) : w.image ? (
+                  <>
+                    <Image
+                      src={urlFor(w.image).width(300).height(300).url()}
+                      alt={w.title}
+                      width={300}
+                      height={300}
+                      className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <h3 className="text-white text-lg sm:text-xl font-bold px-4 text-center">
+                        {w.title}
+                      </h3>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400">No image</span>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       <footer className="w-full bg-[#00B050] text-center py-12 sm:py-14 md:py-16 text-white mt-10 px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-black">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-8 sm:mb-10 md:mb-12 text-[#191919]">
           CONTACTS
         </h2>
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 text-base sm:text-lg md:text-xl lg:text-2xl font-black">
@@ -525,7 +601,7 @@ export default function HomePage() {
             SPOTIFY
           </a>
         </div>
-        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-black">
+        <p className="mt-8 sm:mt-10 text-xs sm:text-sm font-semibold text-[#191919]">
           © ANIL EMMİLER 2026
         </p>
       </footer>
@@ -538,7 +614,12 @@ export default function HomePage() {
             onClick={() => setSelected(null)}
           />
 
-          <div className="relative bg-white rounded-[24px] sm:rounded-[40px] shadow-2xl w-full max-w-[95vw] h-[90vh] z-10 overflow-hidden">
+          <div
+            className="relative bg-white rounded-[24px] sm:rounded-[40px] shadow-2xl w-full max-w-[95vw] h-[90vh] z-10 overflow-hidden"
+            onWheel={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <style jsx global>{`
               .scrollbar-hide::-webkit-scrollbar {
                 display: none;
@@ -822,7 +903,7 @@ export default function HomePage() {
 
           {/* Modal Container */}
           <div className="relative bg-white rounded-[24px] sm:rounded-[40px] shadow-2xl w-full max-w-[95vw] h-[90vh] z-10 overflow-hidden">
-            {/* Close Button - Over images */}
+            {/* Close Button */}
             <button
               onClick={closeLightbox}
               className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-light hover:font-light text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
@@ -834,40 +915,83 @@ export default function HomePage() {
             <div className="relative w-full h-full overflow-hidden">
               <div
                 ref={lightboxScrollRef}
-                className="w-full h-full overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing px-6 sm:px-8 py-6 sm:py-8"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                onMouseDown={handleLightboxMouseDown}
-                onMouseMove={handleLightboxMouseMove}
-                onMouseUp={handleLightboxMouseUp}
-                onMouseLeave={handleLightboxMouseLeave}
+                className={`w-full h-full overflow-x-auto overflow-y-hidden px-6 sm:px-8 py-6 sm:py-8 ${
+                  lightboxImages.length === 1
+                    ? "flex items-center justify-center"
+                    : "cursor-grab active:cursor-grabbing"
+                }`}
+                style={{
+                  scrollBehavior: isLightboxDragging ? "auto" : "smooth",
+                }}
+                onMouseDown={
+                  lightboxImages.length > 1
+                    ? handleLightboxMouseDown
+                    : undefined
+                }
+                onMouseMove={
+                  lightboxImages.length > 1
+                    ? handleLightboxMouseMove
+                    : undefined
+                }
+                onMouseUp={
+                  lightboxImages.length > 1 ? handleLightboxMouseUp : undefined
+                }
+                onMouseLeave={
+                  lightboxImages.length > 1
+                    ? handleLightboxMouseLeave
+                    : undefined
+                }
               >
                 <style jsx>{`
                   div::-webkit-scrollbar {
                     display: none;
                   }
                 `}</style>
-                <div className="flex gap-4 sm:gap-6 h-full w-max items-center">
-                  {lightboxImages.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className="flex-shrink-0 flex items-center justify-center"
-                      style={{ height: "calc(90vh - 3rem)" }}
-                    >
-                      <div className="rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-lg bg-gray-50">
-                        <Image
-                          src={img}
-                          alt={`Image ${idx + 1}`}
-                          width={1200}
-                          height={1200}
-                          className="object-contain w-auto select-none"
-                          style={{ height: "calc(90vh - 4rem)" }}
-                          priority
-                          draggable={false}
-                        />
-                      </div>
+
+                {lightboxImages.length === 1 ? (
+                  // Single image - centered
+                  <div className="flex items-center justify-center h-full">
+                    <div className="rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-lg bg-gray-50">
+                      <Image
+                        src={lightboxImages[0]}
+                        alt="Image"
+                        width={1200}
+                        height={1200}
+                        className="object-contain w-auto select-none"
+                        style={{
+                          maxHeight: "calc(90vh - 8rem)",
+                          maxWidth: "calc(95vw - 4rem)",
+                        }}
+                        priority
+                        draggable={false}
+                      />
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  // Multiple images - scrollable
+                  <div className="flex gap-4 sm:gap-6 h-full w-max items-center">
+                    {lightboxImages.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className="flex-shrink-0 flex items-center justify-center"
+                        style={{ height: "calc(90vh - 3rem)" }}
+                      >
+                        <div className="rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-lg bg-gray-50">
+                          <Image
+                            src={img}
+                            alt={`Image ${idx + 1}`}
+                            width={1200}
+                            height={1200}
+                            className="object-contain w-auto select-none"
+                            style={{ height: "calc(90vh - 4rem)" }}
+                            priority
+                            draggable={false}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
