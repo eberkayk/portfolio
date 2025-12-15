@@ -44,7 +44,7 @@ export default defineType({
         list: [
           { title: 'Illustration', value: 'illustration' },
           { title: 'UI/UX', value: 'ui/ux' },
-          { title: 'Music', value: 'music' },
+          { title: 'Animation', value: 'animation' },
         ],
       },
       validation: (Rule: any) => Rule.required(),

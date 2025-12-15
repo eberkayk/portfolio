@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { Montserrat } from "next/font/google";
 import ClientLayout from "@/components/ClientLayout";
 import LenisProvider from "@/components/LenisProvider";
-import CustomCursor from "@/components/CustomCursor";
+
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* 🧠 Lenis global smooth scroll */}
         <LenisProvider>
           <ClientLayout>{children}</ClientLayout>
-          <CustomCursor />
+          
         </LenisProvider>
       </body>
     </html>

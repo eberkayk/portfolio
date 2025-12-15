@@ -32,10 +32,6 @@ body {
   overflow-y: scroll;
 }
 
-/* Hide default cursor for custom cursor */
-* {
-  cursor: none !important;
-}
 
 /* global link style */
 a {

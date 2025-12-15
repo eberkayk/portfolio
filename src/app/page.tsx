@@ -6,7 +6,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { client, urlFor } from "@/lib/sanity";
 import { FEATURED_WORKS, ALL_WORKS } from "@/lib/queries";
-import logoAnimation from "../../public/logo.json";
+import logoAnimation from "../../public/data.json";
 
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
@@ -14,7 +14,7 @@ type Work = {
   _id: string;
   title: string;
   slug?: string;
-  category: "illustration" | "ui/ux" | "music" | string;
+  category: "illustration" | "ui/ux" | "animation" | string;
   featured?: boolean;
   image?: any;
   video?: string;
@@ -27,7 +27,7 @@ const CATEGORIES: { key: string; label: string }[] = [
   { key: "all", label: "ALL WORKS" },
   { key: "illustration", label: "ILLUSTRATION" },
   { key: "ui/ux", label: "UI/UX" },
-  { key: "music", label: "MUSIC" },
+  { key: "animation", label: "ANIMATION" },
 ];
 //111
 export default function HomePage() {
