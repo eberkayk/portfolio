@@ -14,10 +14,10 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'Anıl Emmiler - Portfolio',
+  title: 'Anıl Emmiler',
   description: 'Istanbul Based Designer & Illustrator',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/favicon.svg',
   },
 }
 
