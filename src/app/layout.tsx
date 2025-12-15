@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { Montserrat } from "next/font/google";
 import ClientLayout from "@/components/ClientLayout";
 import LenisProvider from "@/components/LenisProvider";
+import type { Metadata } from "next";
 
 
 const montserrat = Montserrat({
@@ -12,10 +13,13 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
-export const metadata = {
-  title: "Anıl Emmiler Portfolio",
-  description: "Istanbul Based Designer & Illustrator",
-};
+export const metadata: Metadata = {
+  title: 'Anıl Emmiler - Portfolio',
+  description: 'Istanbul Based Designer & Illustrator',
+  icons: {
+    icon: '/favicon.ico',
+  },
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

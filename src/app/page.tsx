@@ -8,7 +8,10 @@ import { client, urlFor } from "@/lib/sanity";
 import { FEATURED_WORKS, ALL_WORKS } from "@/lib/queries";
 import logoAnimation from "../../public/data.json";
 
-const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false,
+  loading: () => null,
+});
 
 type Work = {
   _id: string;
@@ -48,7 +51,7 @@ export default function HomePage() {
   const [scrollLeft, setScrollLeft] = useState(0);
 
   const [velocity, setVelocity] = useState(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const [isLightboxDragging, setIsLightboxDragging] = useState(false);
   const [lightboxStartX, setLightboxStartX] = useState(0);
   const [lightboxScrollLeft, setLightboxScrollLeft] = useState(0);
@@ -182,14 +185,12 @@ export default function HomePage() {
 
   useEffect(() => {
     if (selected || lightboxImages.length > 0) {
-      // Scroll pozisyonunu kaydet
       const scrollY = window.scrollY;
       document.body.style.overflow = "hidden";
       document.body.style.top = `-${scrollY}px`;
       document.body.style.position = "fixed";
       document.body.style.width = "100%";
 
-      // Cleanup: Scroll pozisyonunu geri yükle
       return () => {
         document.body.style.overflow = "";
         document.body.style.position = "";
@@ -199,7 +200,6 @@ export default function HomePage() {
       };
     }
   }, [selected, lightboxImages]);
-
   useEffect(() => {
     if (lightboxImages.length === 0) return;
 

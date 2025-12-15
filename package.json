@@ -7,31 +7,31 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "studio": "npx sanity dev --port 3333"
+    "studio": "sanity dev --port 3333"
   },
   "dependencies": {
     "@sanity/icons": "^3.5.2",
     "@sanity/vision": "^3.69.1",
     "framer-motion": "^11.15.0",
-    "lenis": "^1.1.0",
-    "lottie-react": "^2.4.1",
-    "next": "14.2.13",
-    "next-sanity": "^11.6.6",
-    "react": "^18",
-    "react-dom": "^18",
-    "sanity": "^3.69.1",
+    "lenis": "^1.1.17",
+    "lottie-react": "^2.4.0",
+    "next": "^16.0.10",
+    "next-sanity": "^11.6.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^4.19.0",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.13",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "eslint": "^9.17.0",
+    "eslint-config-next": "15.5.7",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.7.2"
   },
   "engines": {
     "node": "22.x"
