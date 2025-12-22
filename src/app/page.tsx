@@ -16,14 +16,19 @@ const Lottie = dynamic(() => import("lottie-react"), {
 type Work = {
   _id: string;
   title: string;
-  slug?: string;
+  slug?: {
+    current?: string;
+    _type?: string;
+  };
   category: "illustration" | "ui/ux" | "animation" | string;
   featured?: boolean;
   image?: any;
   video?: string;
   description?: string;
   images?: any[];
+  videos?: string[];
   createdAt?: string;
+  order?: number;
 };
 
 const CATEGORIES: { key: string; label: string }[] = [
@@ -55,6 +60,18 @@ export default function HomePage() {
   const [isLightboxDragging, setIsLightboxDragging] = useState(false);
   const [lightboxStartX, setLightboxStartX] = useState(0);
   const [lightboxScrollLeft, setLightboxScrollLeft] = useState(0);
+
+  const openModal = (work: Work) => {
+    setSelected(work);
+    if (work.slug?.current) {
+      window.location.hash = work.slug.current;
+    }
+  };
+
+  const closeModal = () => {
+    setSelected(null);
+    window.location.hash = "";
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const container = scrollContainerRef.current;
@@ -217,8 +234,22 @@ export default function HomePage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxImages]);
 
+  const filtered = useMemo(() => {
+    const result =
+      filter === "all"
+        ? allWorks
+        : allWorks.filter((w) => w.category === filter);
+
+    return result;
+  }, [filter, allWorks]);
+
   // Scroll animation for work cards - triggers every time
   useEffect(() => {
+    // Clear previous cards
+    if (visibleCards.size === 0) {
+      workCardsRef.current = [];
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -226,27 +257,41 @@ export default function HomePage() {
           if (!id) return;
 
           if (entry.isIntersecting) {
-            // Add to visible cards when in view
-            setVisibleCards((prev) => new Set(prev).add(id));
-          } else {
-            // Remove from visible cards when out of view
+            // Card görününce ekle
             setVisibleCards((prev) => {
-              const next = new Set(prev);
-              next.delete(id);
-              return next;
+              const newSet = new Set(prev);
+              newSet.add(id);
+              return newSet;
+            });
+          } else {
+            // Card gizlenince çıkar (tekrar trigger olsun diye)
+            setVisibleCards((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(id);
+              return newSet;
             });
           }
         });
       },
-      { threshold: 0.2, rootMargin: "0px" }
+      {
+        threshold: 0.1,
+        rootMargin: "50px",
+      }
     );
 
-    workCardsRef.current.forEach((card) => {
-      if (card) observer.observe(card);
-    });
+    // Small delay to ensure DOM is updated
+    setTimeout(() => {
+      workCardsRef.current.forEach((card) => {
+        if (card) observer.observe(card);
+      });
+    }, 50);
 
-    return () => observer.disconnect();
-  }, [allWorks]);
+    return () => {
+      workCardsRef.current.forEach((card) => {
+        if (card) observer.unobserve(card);
+      });
+    };
+  }, [filtered, filter]);
 
   // Cleanup animation frame on unmount
   useEffect(() => {
@@ -257,10 +302,40 @@ export default function HomePage() {
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    if (filter === "all") return allWorks;
-    return allWorks.filter((w) => w.category === filter);
-  }, [allWorks, filter]);
+  // Reset visible cards when filter changes
+  useEffect(() => {
+    if (filter !== "all") {
+      setVisibleCards(new Set());
+      workCardsRef.current = [];
+    }
+  }, [filter]);
+
+  // Handle hash changes (open modal from URL)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+
+      if (hash) {
+        // Find work by slug
+        const work = allWorks.find((w) => w.slug?.current === hash);
+        if (work) {
+          setSelected(work);
+        }
+      } else {
+        setSelected(null);
+      }
+    };
+
+    // Check hash on mount
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [allWorks]);
 
   const openLightbox = (images: any[], index: number) => {
     const imageUrls = images.map((img) =>
@@ -403,10 +478,10 @@ export default function HomePage() {
                     />
                   ) : work.image ? (
                     <Image
-                      src={urlFor(work.image).width(500).height(500).url()}
+                      src={urlFor(work.image).width(1200).height(1200).url()}
                       alt={work.title}
-                      width={500}
-                      height={500}
+                      width={1200}
+                      height={1200}
                       className="object-cover w-full h-full pointer-events-none"
                     />
                   ) : (
@@ -416,7 +491,7 @@ export default function HomePage() {
                   )}
                 </div>
                 <button
-                  onClick={() => setSelected(work)}
+                  onClick={() => openModal(work)}
                   className="mt-4 px-6 py-2 bg-[#F8F8F8] text-[#191919] shadow-sm rounded-full font-semibold hover:bg-[#F8F8F8] transition-transform duration-300 hover:scale-110"
                 >
                   {work.title}
@@ -454,14 +529,10 @@ export default function HomePage() {
                 workCardsRef.current[index] = el;
               }}
               data-work-id={w._id}
-              onClick={() => {
-                console.log("Selected work:", w);
-                setSelected(w);
-              }}
               className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
                 visibleCards.has(w._id)
                   ? "opacity-100 scale-100 translate-y-0"
-                  : "opacity-0 scale-90 translate-y-8"
+                  : "opacity-0 scale-0 translate-y-8"
               }`}
             >
               {/* Stack Effect - Show actual images if multiple */}
@@ -476,10 +547,10 @@ export default function HomePage() {
                     }}
                   >
                     <Image
-                      src={urlFor(w.images[2]).width(300).height(300).url()}
+                      src={urlFor(w.images[2]).width(1200).height(1200).url()}
                       alt=""
-                      width={300}
-                      height={300}
+                      width={1200}
+                      height={1200}
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -493,10 +564,10 @@ export default function HomePage() {
                     }}
                   >
                     <Image
-                      src={urlFor(w.images[1]).width(300).height(300).url()}
+                      src={urlFor(w.images[1]).width(1200).height(1200).url()}
                       alt=""
-                      width={300}
-                      height={300}
+                      width={1200}
+                      height={1200}
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -514,10 +585,10 @@ export default function HomePage() {
                     }}
                   >
                     <Image
-                      src={urlFor(w.images[1]).width(300).height(300).url()}
+                      src={urlFor(w.images[1]).width(1200).height(1200).url()}
                       alt=""
-                      width={300}
-                      height={300}
+                      width={1200}
+                      height={1200}
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -525,6 +596,10 @@ export default function HomePage() {
               )}
 
               {/* Main image container (1st image or cover) */}
+              <div
+                onClick={() => openModal(w)}
+                className="absolute inset-0 z-10"
+              />
               <div
                 className="relative w-full h-full rounded-2xl overflow-hidden bg-white"
                 style={{ zIndex: 3 }}
@@ -548,10 +623,10 @@ export default function HomePage() {
                 ) : w.image ? (
                   <>
                     <Image
-                      src={urlFor(w.image).width(300).height(300).url()}
+                      src={urlFor(w.image).width(1200).height(1200).url()}
                       alt={w.title}
-                      width={300}
-                      height={300}
+                      width={1200}
+                      height={1200}
                       className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -611,7 +686,7 @@ export default function HomePage() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-[30px]">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setSelected(null)}
+            onClick={closeModal}
           />
 
           <div
@@ -650,7 +725,7 @@ export default function HomePage() {
             `}</style>
 
             <button
-              onClick={() => setSelected(null)}
+              onClick={closeModal}
               className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-extralight hover:font-extralight text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
             >
               ×
@@ -670,11 +745,33 @@ export default function HomePage() {
                 )}
               </div>
 
+              {/* Videos Section - ALWAYS FIRST IF EXISTS */}
+              {selected.videos && selected.videos.length > 0 && (
+                <div className="w-full space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+                  {selected.videos.map((videoUrl: string, idx: number) => (
+                    <div
+                      key={`video-${idx}`}
+                      className="w-full max-w-4xl mx-auto rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-lg"
+                    >
+                      <video
+                        src={videoUrl}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-auto"
+                        style={{ maxHeight: "70vh" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* Single image */}
               {((selected.image &&
                 (!selected.images || selected.images.length === 0)) ||
                 (selected.images && selected.images.length === 1)) && (
-                <div className="w-full flex justify-center items-center">
+                <div className="w-full flex justify-center items-center mb-6 sm:mb-8">
                   <div
                     className="rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-lg cursor-pointer w-full max-w-[90vw] sm:max-w-[min(65vh,650px)] aspect-square"
                     onClick={() => {
@@ -697,6 +794,7 @@ export default function HomePage() {
                           src={urlFor(imageToShow)
                             .width(1200)
                             .height(1200)
+                            .quality(90)
                             .url()}
                           alt={selected.title || "Work image"}
                           width={1200}
@@ -712,7 +810,7 @@ export default function HomePage() {
 
               {/* Two images */}
               {selected.images && selected.images.length === 2 && (
-                <>
+                <div className="mb-6 sm:mb-8">
                   {/* Mobile: Horizontal scroll with peek */}
                   <div className="sm:hidden w-full overflow-x-auto scrollbar-hide">
                     <div className="flex gap-4 w-max pl-4 pr-4">
@@ -724,10 +822,14 @@ export default function HomePage() {
                           onClick={() => openLightbox(selected.images!, idx)}
                         >
                           <Image
-                            src={urlFor(img).width(900).height(900).url()}
+                            src={urlFor(img)
+                              .width(1200)
+                              .height(1200)
+                              .quality(100)
+                              .url()}
                             alt={`${selected.title} ${idx + 1}`}
-                            width={900}
-                            height={900}
+                            width={1200}
+                            height={1200}
                             className="object-cover w-full h-full"
                           />
                         </div>
@@ -745,16 +847,20 @@ export default function HomePage() {
                         onClick={() => openLightbox(selected.images!, idx)}
                       >
                         <Image
-                          src={urlFor(img).width(800).height(800).url()}
+                          src={urlFor(img)
+                            .width(1200)
+                            .height(1200)
+                            .quality(100)
+                            .url()}
                           alt={`${selected.title} ${idx + 1}`}
-                          width={800}
-                          height={800}
+                          width={1200}
+                          height={1200}
                           className="object-cover w-full h-full"
                         />
                       </div>
                     ))}
                   </div>
-                </>
+                </div>
               )}
 
               {/* Multiple images (3+) */}
@@ -766,7 +872,6 @@ export default function HomePage() {
                       const position = idx % 3;
 
                       if (position === 0 || position === 1) {
-                        // First two of every three: side by side
                         if (idx === 0 || idx % 3 === 0) {
                           return (
                             <div
@@ -788,12 +893,13 @@ export default function HomePage() {
                                   >
                                     <Image
                                       src={urlFor(img)
-                                        .width(500)
-                                        .height(500)
+                                        .width(1200)
+                                        .height(1200)
+                                        .quality(100)
                                         .url()}
                                       alt={`${selected.title} ${idx + subIdx + 1}`}
-                                      width={500}
-                                      height={500}
+                                      width={1200}
+                                      height={1200}
                                       className="object-cover w-full h-full"
                                     />
                                   </div>
@@ -803,7 +909,6 @@ export default function HomePage() {
                         }
                         return null;
                       } else {
-                        // Third of every three: full width
                         return (
                           <div
                             key={idx}
@@ -811,10 +916,14 @@ export default function HomePage() {
                             onClick={() => openLightbox(selected.images!, idx)}
                           >
                             <Image
-                              src={urlFor(img).width(900).height(506).url()}
+                              src={urlFor(img)
+                                .width(1200)
+                                .height(1200)
+                                .quality(100)
+                                .url()}
                               alt={`${selected.title} ${idx + 1}`}
-                              width={900}
-                              height={506}
+                              width={1200}
+                              height={1200}
                               className="object-cover w-full h-full"
                             />
                           </div>
@@ -829,7 +938,6 @@ export default function HomePage() {
                       const position = idx % 3;
 
                       if (position === 0 || position === 1) {
-                        // First two of every three: side by side
                         if (idx === 0 || idx % 3 === 0) {
                           return (
                             <div
@@ -851,12 +959,13 @@ export default function HomePage() {
                                   >
                                     <Image
                                       src={urlFor(img)
-                                        .width(800)
-                                        .height(800)
+                                        .width(1200)
+                                        .height(1200)
+                                        .quality(100)
                                         .url()}
                                       alt={`${selected.title} ${idx + subIdx + 1}`}
-                                      width={800}
-                                      height={800}
+                                      width={1200}
+                                      height={1200}
                                       className="object-cover w-full h-full"
                                     />
                                   </div>
@@ -866,7 +975,6 @@ export default function HomePage() {
                         }
                         return null;
                       } else {
-                        // Third of every three: full width
                         return (
                           <div
                             key={idx}
@@ -874,7 +982,11 @@ export default function HomePage() {
                             onClick={() => openLightbox(selected.images!, idx)}
                           >
                             <Image
-                              src={urlFor(img).width(1400).height(788).url()}
+                              src={urlFor(img)
+                                .width(1400)
+                                .height(788)
+                                .quality(90)
+                                .url()}
                               alt={`${selected.title} ${idx + 1}`}
                               width={1400}
                               height={788}
@@ -906,7 +1018,7 @@ export default function HomePage() {
             {/* Close Button */}
             <button
               onClick={closeLightbox}
-              className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-light hover:font-light text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
+              className="absolute top-4 right-4 sm:top-[30px] sm:right-[30px] w-12 h-12 sm:w-[60px] sm:h-[60px] flex items-center justify-center font-extralight hover:font-extralight text-black hover:text-black text-5xl sm:text-7xl leading-none z-20 bg-gray-100 hover:bg-gray-200 rounded-full transition-all hover:scale-110"
             >
               ×
             </button>

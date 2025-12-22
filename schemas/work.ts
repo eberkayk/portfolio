@@ -7,6 +7,14 @@ export default defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      description: 'Lower numbers appear first (1, 2, 3...)',
+      validation: (Rule: any) => Rule.min(0),
+      initialValue: 0,
+    }),
+    defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
@@ -57,6 +65,20 @@ export default defineType({
         accept: 'video/*',
       },
     }),
+    defineField({
+      name: 'videos',
+      title: 'Additional Videos',
+      type: 'array',
+      of: [
+        {
+          type: 'file',
+          options: {
+          accept: 'video/*',
+          },
+        },
+      ],
+      description: 'Upload multiple videos to show in modal',
+      }),
     defineField({
       name: 'featured',
       title: 'Featured',

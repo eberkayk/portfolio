@@ -29,7 +29,7 @@ export const ABOUT_PAGE = `
 `;
 
 export const FEATURED_WORKS = `
-  *[_type == "work" && featured == true] | order(createdAt desc) {
+  *[_type == "work" && featured == true] | order(coalesce(order, 999) asc, createdAt desc) {
     _id,
     title,
     slug,
@@ -37,6 +37,7 @@ export const FEATURED_WORKS = `
     featured,
     image,
    "video": video.asset->url,
+   "videos": videos[].asset->url,
     description,
     images,
     createdAt
@@ -44,7 +45,7 @@ export const FEATURED_WORKS = `
 `;
 
 export const ALL_WORKS = `
-  *[_type == "work"] | order(createdAt desc) {
+  *[_type == "work"] | order(coalesce(order, 999) asc, createdAt desc) {
     _id,
     title,
     slug,
@@ -52,6 +53,7 @@ export const ALL_WORKS = `
     featured,
     image,
     "video": video.asset->url,
+    "videos": videos[].asset->url,
     description,
     images,
     createdAt

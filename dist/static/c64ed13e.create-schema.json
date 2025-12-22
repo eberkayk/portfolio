@@ -1,0 +1,400 @@
+[
+  {
+    "fields": [
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Lower numbers appear first (1, 2, 3...)",
+        "name": "order",
+        "type": "number",
+        "title": "Display Order"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Main Image"
+      },
+      {
+        "of": [
+          {
+            "type": "image"
+          }
+        ],
+        "name": "images",
+        "type": "array",
+        "title": "Additional Images"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Illustration",
+              "value": "illustration"
+            },
+            {
+              "title": "UI/UX",
+              "value": "ui/ux"
+            },
+            {
+              "title": "Animation",
+              "value": "animation"
+            }
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "illustration",
+                  "ui/ux",
+                  "animation"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "options": {
+          "accept": "video/*"
+        },
+        "name": "video",
+        "type": "file"
+      },
+      {
+        "description": "Upload multiple videos to show in modal",
+        "of": [
+          {
+            "options": {
+              "accept": "video/*"
+            },
+            "type": "file"
+          }
+        ],
+        "name": "videos",
+        "type": "array",
+        "title": "Additional Videos"
+      },
+      {
+        "initialValue": false,
+        "name": "featured",
+        "type": "boolean"
+      },
+      {
+        "name": "description",
+        "type": "text"
+      }
+    ],
+    "name": "work",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "profileImage",
+        "type": "image"
+      },
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "thingsIDo",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "name",
+                "type": "string",
+                "title": "Tool Name"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "name": "logo",
+                "type": "image",
+                "title": "Tool Logo"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "toolsIUse",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "company",
+                "type": "string"
+              },
+              {
+                "name": "role",
+                "type": "string"
+              },
+              {
+                "name": "duration",
+                "type": "string"
+              },
+              {
+                "of": [
+                  {
+                    "type": "string"
+                  }
+                ],
+                "name": "tasks",
+                "type": "array"
+              },
+              {
+                "initialValue": false,
+                "name": "current",
+                "type": "boolean",
+                "title": "Current Position"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "name": "logo",
+                "type": "image",
+                "title": "Company Logo"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "experience",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "school",
+                "type": "string"
+              },
+              {
+                "name": "degree",
+                "type": "string"
+              },
+              {
+                "name": "duration",
+                "type": "string"
+              },
+              {
+                "name": "gpa",
+                "type": "string",
+                "title": "GPA"
+              },
+              {
+                "name": "degreeType",
+                "type": "string"
+              },
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "name": "logo",
+                "type": "image",
+                "title": "School Logo"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "education",
+        "type": "array"
+      }
+    ],
+    "name": "about",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "role",
+        "type": "string"
+      },
+      {
+        "name": "company",
+        "type": "string"
+      },
+      {
+        "name": "duration",
+        "type": "string"
+      },
+      {
+        "name": "current",
+        "type": "boolean",
+        "title": "Current Role?"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "description",
+        "type": "array"
+      },
+      {
+        "name": "logo",
+        "type": "image"
+      }
+    ],
+    "name": "experience",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "degree",
+        "type": "string"
+      },
+      {
+        "name": "school",
+        "type": "string"
+      },
+      {
+        "name": "years",
+        "type": "string"
+      },
+      {
+        "name": "gpa",
+        "type": "string",
+        "title": "GPA"
+      },
+      {
+        "name": "logo",
+        "type": "image"
+      }
+    ],
+    "name": "education",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "fields": [
+              {
+                "name": "caption",
+                "type": "string"
+              }
+            ],
+            "type": "image"
+          }
+        ],
+        "name": "images",
+        "type": "array"
+      }
+    ],
+    "name": "gallery",
+    "type": "document"
+  }
+]

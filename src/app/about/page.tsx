@@ -68,10 +68,10 @@ export default function AboutPage() {
         <div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[260px] md:h-[260px] rounded-2xl overflow-hidden shadow-lg">
           {data.profileImage ? (
             <Image
-              src={urlFor(data.profileImage).width(260).height(260).url()}
+              src={urlFor(data.profileImage).width(1200).height(1200).url()}
               alt={data.name || "Profile"}
-              width={260}
-              height={260}
+              width={1200}
+              height={1200}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -183,17 +183,17 @@ export default function AboutPage() {
                       <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#191919] break-words">
                         {exp.role}
                       </h3>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-1 font-medium break-words">
+                      <p className="text-sm sm:text-base md:text-lg text-[#191919] mt-1 font-medium break-words">
                         {exp.company}
                       </p>
-                      <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
+                      <p className="text-xs sm:text-sm md:text-base text-[#191919] mt-1">
                         {exp.duration}
                       </p>
                     </div>
 
                     {exp.tasks && exp.tasks.length > 0 && (
                       <div className="flex-1 sm:flex-[1.2] min-w-0">
-                        <ul className="space-y-1.5 text-xs sm:text-sm md:text-base text-gray-700">
+                        <ul className="space-y-1.5 text-xs sm:text-sm md:text-base text-[#191919]">
                           {exp.tasks.map((task, idx) => (
                             <li
                               key={idx}
@@ -244,23 +244,23 @@ export default function AboutPage() {
                       <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-2 break-words text-[#191919]">
                         {edu.degree}
                       </h3>
-                      <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-700 mb-1 break-words">
+                      <p className="text-sm sm:text-base md:text-lg font-medium text-[#191919] mb-2 break-words">
                         {edu.school}
                       </p>
-                      <p className="text-xs sm:text-sm md:text-base text-gray-500">
+                      <p className="text-xs sm:text-sm md:text-base text-[#191919]">
                         {edu.duration}
                       </p>
                     </div>
 
                     {/* Sağ - Degree Type & GPA */}
-                    <div className="flex-1 sm:flex-[0.8] min-w-0">
+                    <div className="flex-1 sm:flex-[1.2] min-w-0">
                       {edu.degreeType && (
-                        <p className="text-sm sm:text-base md:text-lg text-gray-700 mb-1">
+                        <p className="text-xs sm:text-sm md:text-base text-[#191919] mb-2">
                           {edu.degreeType}
                         </p>
                       )}
                       {edu.gpa && (
-                        <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-700">
+                        <p className="text-xs sm:text-sm md:text-base text-[#191919]">
                           {edu.gpa}
                         </p>
                       )}
