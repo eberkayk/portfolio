@@ -4,6 +4,7 @@ export const ABOUT_PAGE = `
     name,
     title,
     email,
+    introText,
     thingsIDo,
     toolsIUse[] {
       name,

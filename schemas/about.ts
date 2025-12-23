@@ -29,6 +29,12 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'introText',
+      title: 'Intro Text',
+      type: 'text',
+      description: 'Text shown between hero and "Things I Do" section',
+    }),
+    defineField({
       name: 'thingsIDo',
       title: 'Things I Do',
       type: 'array',

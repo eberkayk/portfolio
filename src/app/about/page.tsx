@@ -11,6 +11,7 @@ type About = {
   name?: string;
   title?: string;
   email?: string;
+  introText?: string;
   thingsIDo?: string[];
   toolsIUse?: Array<{
     name: string;
@@ -97,6 +98,15 @@ export default function AboutPage() {
           {data.email || "anilemmiler@gmail.com"}
         </a>
       </section>
+
+      {/* Intro Text */}
+      {data.introText && (
+        <div className="max-w-3xl mx-auto px-4 sm:px-0 mb-36 mt-36">
+          <p className="text-center text-xl sm:text-2xl md:text-3xl text-[#191919] font-black">
+            {data.introText}
+          </p>
+        </div>
+      )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
         {data.thingsIDo && data.thingsIDo.length > 0 && (

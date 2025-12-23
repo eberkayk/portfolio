@@ -106,7 +106,7 @@ export default function HomePage() {
   const handleMouseUp = () => {
     setIsDragging(false);
     const container = scrollContainerRef.current;
-    if (container) {
+    if (!container) {
       container.style.cursor = "grab";
       container.style.scrollBehavior = "smooth";
 
@@ -190,8 +190,6 @@ export default function HomePage() {
           client.fetch<Work[]>(FEATURED_WORKS),
           client.fetch<Work[]>(ALL_WORKS),
         ]);
-        console.log("Fetched works:", a); // ← EKLEME
-        console.log("Sample work:", a[0]); // ← EKLEME
         setFeatured(f || []);
         setAllWorks(a || []);
       } catch (e) {
@@ -239,17 +237,11 @@ export default function HomePage() {
       filter === "all"
         ? allWorks
         : allWorks.filter((w) => w.category === filter);
-
     return result;
   }, [filter, allWorks]);
 
   // Scroll animation for work cards - triggers every time
   useEffect(() => {
-    // Clear previous cards
-    if (visibleCards.size === 0) {
-      workCardsRef.current = [];
-    }
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -257,14 +249,8 @@ export default function HomePage() {
           if (!id) return;
 
           if (entry.isIntersecting) {
-            // Card görününce ekle
-            setVisibleCards((prev) => {
-              const newSet = new Set(prev);
-              newSet.add(id);
-              return newSet;
-            });
+            setVisibleCards((prev) => new Set([...prev, id]));
           } else {
-            // Card gizlenince çıkar (tekrar trigger olsun diye)
             setVisibleCards((prev) => {
               const newSet = new Set(prev);
               newSet.delete(id);
@@ -275,23 +261,23 @@ export default function HomePage() {
       },
       {
         threshold: 0.1,
-        rootMargin: "50px",
+        rootMargin: "50px 0px -50px 0px",
       }
     );
 
-    // Small delay to ensure DOM is updated
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       workCardsRef.current.forEach((card) => {
         if (card) observer.observe(card);
       });
-    }, 50);
+    }, 100);
 
     return () => {
+      clearTimeout(timer);
       workCardsRef.current.forEach((card) => {
         if (card) observer.unobserve(card);
       });
     };
-  }, [filtered, filter]);
+  }, [filtered]);
 
   // Cleanup animation frame on unmount
   useEffect(() => {
@@ -304,10 +290,8 @@ export default function HomePage() {
 
   // Reset visible cards when filter changes
   useEffect(() => {
-    if (filter !== "all") {
-      setVisibleCards(new Set());
-      workCardsRef.current = [];
-    }
+    setVisibleCards(new Set());
+    workCardsRef.current = [];
   }, [filter]);
 
   // Handle hash changes (open modal from URL)
@@ -532,7 +516,7 @@ export default function HomePage() {
               className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
                 visibleCards.has(w._id)
                   ? "opacity-100 scale-100 translate-y-0"
-                  : "opacity-0 scale-0 translate-y-8"
+                  : "opacity-0 scale-90 translate-y-8"
               }`}
             >
               {/* Stack Effect - Show actual images if multiple */}
