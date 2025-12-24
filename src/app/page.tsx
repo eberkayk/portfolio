@@ -106,25 +106,24 @@ export default function HomePage() {
   const handleMouseUp = () => {
     setIsDragging(false);
     const container = scrollContainerRef.current;
-    if (!container) {
-      container.style.cursor = "grab";
-      container.style.scrollBehavior = "smooth";
+    if (!container) return; // ← Early return
 
-      // Apply momentum
-      let currentVelocity = velocity;
-      const friction = 0.95;
+    container.style.cursor = "grab";
+    container.style.scrollBehavior = "smooth";
 
-      const animate = () => {
-        if (Math.abs(currentVelocity) > 0.5) {
-          currentVelocity *= friction;
-          container.scrollLeft -= currentVelocity;
-          animationRef.current = requestAnimationFrame(animate);
-        }
-      };
+    let currentVelocity = velocity;
+    const friction = 0.95;
 
-      if (Math.abs(currentVelocity) > 1) {
-        animate();
+    const animate = () => {
+      if (Math.abs(currentVelocity) > 0.5) {
+        currentVelocity *= friction;
+        container.scrollLeft -= currentVelocity;
+        animationRef.current = requestAnimationFrame(animate);
       }
+    };
+
+    if (Math.abs(currentVelocity) > 1) {
+      animate();
     }
   };
 
@@ -513,10 +512,10 @@ export default function HomePage() {
                 workCardsRef.current[index] = el;
               }}
               data-work-id={w._id}
-              className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-700 ease-out ${
+              className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-1000 ease-out ${
                 visibleCards.has(w._id)
-                  ? "opacity-100 scale-100 translate-y-0"
-                  : "opacity-0 scale-90 translate-y-8"
+                  ? "opacity-100 scale-100 translate-y-0 rotate-0"
+                  : "opacity-0 scale-75 translate-y-16 rotate-3"
               }`}
             >
               {/* Stack Effect - Show actual images if multiple */}
