@@ -514,8 +514,8 @@ export default function HomePage() {
               data-work-id={w._id}
               className={`w-[300px] h-[300px] rounded-2xl overflow-visible bg-transparent shadow-lg cursor-pointer relative group transition-all duration-1000 ease-out ${
                 visibleCards.has(w._id)
-                  ? "opacity-100 scale-100 translate-y-0 rotate-0"
-                  : "opacity-0 scale-75 translate-y-16 rotate-3"
+                  ? "opacity-100 scale-100 translate-y-0"
+                  : "opacity-0 scale-75 translate-y-16"
               }`}
             >
               {/* Stack Effect - Show actual images if multiple */}
