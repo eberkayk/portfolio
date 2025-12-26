@@ -59,7 +59,7 @@ export default function AboutPage() {
         href="/"
         className="fixed top-4 right-4 sm:top-6 sm:right-6 md:top-10 md:right-10 w-14 h-14 sm:w-16 sm:h-16 md:w-[70px] md:h-[70px] rounded-full bg-[#00B050] z-50 flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300"
       >
-        <span className="text-[#191919] text-6xl sm:text-7xl md:text-8xl font-extralight leading-none hover:scale-110 transition-transform duration-300">
+        <span className="text-[#003300] text-6xl sm:text-7xl md:text-8xl font-extralight leading-none hover:scale-110 transition-transform duration-300">
           ×
         </span>
       </Link>
@@ -209,7 +209,7 @@ export default function AboutPage() {
                               key={idx}
                               className="flex items-start break-words"
                             >
-                              <span className="mr-2 flex-shrink-0">•</span>
+                              <span className="mr-2 flex-shrink-0"></span>
                               <span className="flex-1">{task}</span>
                             </li>
                           ))}
