@@ -209,7 +209,7 @@ export default function AboutPage() {
                               key={idx}
                               className="flex items-start break-words"
                             >
-                              <span className="mr-2 flex-shrink-0"></span>
+                              <span className="mr-0 flex-shrink-0"></span>
                               <span className="flex-1">{task}</span>
                             </li>
                           ))}
