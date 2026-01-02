@@ -443,13 +443,13 @@ export default function HomePage() {
             }
           `}</style>
 
-          <div className="flex gap-[100px] w-max">
+          <div className="flex gap-8 sm:gap-16 md:gap-20 lg:gap-[100px] w-max">
             {featured.map((work) => (
               <div
                 key={work._id}
                 className="flex flex-col items-center flex-shrink-0"
               >
-                <div className="w-[500px] h-[500px] rounded-3xl overflow-hidden shadow-lg pointer-events-none select-none">
+                <div className="w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[450px] lg:h-[450px] xl:w-[500px] xl:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg pointer-events-none select-none">
                   {work.video ? (
                     <video
                       src={work.video}
