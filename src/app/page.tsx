@@ -418,7 +418,7 @@ export default function HomePage() {
       {/* 100px spacing */}
       <div className="h-[100px]"></div>
 
-      <section className="w-full mb-[200px]">
+      <section className="w-full mb-[100px] sm:mb-[200px]">
         <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-[#191919] text-center mb-12 px-4">
           FEATURED WORKS
         </h2>
