@@ -795,13 +795,13 @@ export default function HomePage() {
               {selected.images && selected.images.length === 2 && (
                 <div className="mb-6 sm:mb-8">
                   {/* Mobile: Horizontal scroll with peek */}
-                  <div className="sm:hidden w-full overflow-x-scroll scrollbar-hide py-4 -mx-4 px-4">
-                    <div className="flex gap-4 w-max">
+                  <div className="sm:hidden w-full overflow-x-auto scrollbar-hide py-4 px-4">
+                    <div className="flex gap-4">
                       {selected.images.map((img: any, idx: number) => (
                         <div
                           key={idx}
                           className="rounded-[24px] overflow-hidden shadow-lg cursor-pointer aspect-square flex-shrink-0"
-                          style={{ width: "calc(90vw - 40px)" }}
+                          style={{ width: "calc(80vw - 32px)" }}
                           onClick={() => openLightbox(selected.images!, idx)}
                         >
                           <Image
