@@ -70,7 +70,7 @@ export default function AboutPage() {
           {data.profileImage ? (
             <Image
               src={urlFor(data.profileImage).width(1200).height(1200).url()}
-              alt={data.name || "Profile"}
+              alt="Anıl Emmiler - Designer and Illustrator profile photo"
               width={1200}
               height={1200}
               className="w-full h-full object-cover"
