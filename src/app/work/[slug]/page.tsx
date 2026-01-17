@@ -31,11 +31,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const ogImageUrl = work.ogImage 
-    ? urlFor(work.ogImage).width(1200).height(630).quality(90).url()
-    : work.image
-    ? urlFor(work.image).width(1200).height(630).quality(90).url()
-    : 'https://anilemmiler.com/og-image.jpg'
+  // Determine OG image with proper fallback chain
+  let ogImageUrl = 'https://anilemmiler.com/og-image.jpg' // Default fallback
+
+  if (work.ogImage) {
+    // Priority 1: Dedicated OG image
+    ogImageUrl = urlFor(work.ogImage).width(1200).height(630).quality(90).url()
+  } else if (work.images && work.images.length > 0) {
+    // Priority 2: First image from gallery
+    ogImageUrl = urlFor(work.images[0]).width(1200).height(630).quality(90).url()
+  } else if (work.image) {
+    // Priority 3: Main image
+    ogImageUrl = urlFor(work.image).width(1200).height(630).quality(90).url()
+  }
 
   return {
     title: `${work.title} - Anıl Emmiler`,
