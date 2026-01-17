@@ -400,16 +400,29 @@ export default function HomePage() {
         </span>
       </Link>
 
-      <section className="flex flex-col items-center text-center mt-20 sm:mt-24 md:mt-28 mb-12 sm:mb-16 px-4 w-full max-w-7xl">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tight text-[#191919]">
+      {/* HERO SECTION */}
+      <section 
+        className="flex flex-col items-center text-center mt-20 sm:mt-24 md:mt-28 mb-12 sm:mb-16 px-4 w-full max-w-7xl"
+        itemScope 
+        itemType="https://schema.org/Person"
+      >
+        <h1 
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tight text-[#191919]"
+          itemProp="name"
+        >
           ANIL EMMİLER
         </h1>
-        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 text-[#191919]">
+        <p 
+          className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 text-[#191919]"
+          itemProp="jobTitle"
+        >
           ISTANBUL BASED DESIGNER & ILLUSTRATOR
         </p>
+        <meta itemProp="address" content="Istanbul, Turkey" />
         <a
           href="mailto:anilemmiler@gmail.com"
           className="mt-2 text-base sm:text-lg md:text-xl lg:text-2xl font-black text-[#26a95a] hover:text-[#063F14] transition-colors duration-300"
+          itemProp="email"
         >
           anilemmiler@gmail.com
         </a>
@@ -462,7 +475,7 @@ export default function HomePage() {
                   ) : work.image ? (
                     <Image
                       src={urlFor(work.image).width(1200).height(1200).url()}
-                      alt={work.title}
+                      alt={`${work.title} - ${work.category} by Anıl Emmiler`}
                       width={1200}
                       height={1200}
                       className="object-cover w-full h-full pointer-events-none"
@@ -531,7 +544,7 @@ export default function HomePage() {
                   >
                     <Image
                       src={urlFor(w.images[2]).width(1200).height(1200).url()}
-                      alt=""
+                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
                       width={1200}
                       height={1200}
                       className="object-cover w-full h-full"
@@ -548,7 +561,7 @@ export default function HomePage() {
                   >
                     <Image
                       src={urlFor(w.images[1]).width(1200).height(1200).url()}
-                      alt=""
+                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
                       width={1200}
                       height={1200}
                       className="object-cover w-full h-full"
@@ -569,7 +582,7 @@ export default function HomePage() {
                   >
                     <Image
                       src={urlFor(w.images[1]).width(1200).height(1200).url()}
-                      alt=""
+                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
                       width={1200}
                       height={1200}
                       className="object-cover w-full h-full"
@@ -607,7 +620,7 @@ export default function HomePage() {
                   <>
                     <Image
                       src={urlFor(w.image).width(1200).height(1200).url()}
-                      alt={w.title}
+                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
                       width={1200}
                       height={1200}
                       className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
@@ -795,13 +808,13 @@ export default function HomePage() {
               {selected.images && selected.images.length === 2 && (
                 <div className="mb-6 sm:mb-8">
                   {/* Mobile: Horizontal scroll with peek */}
-                  <div className="sm:hidden w-full overflow-x-scroll scrollbar-hide py-4 -mx-4 px-4">
-                    <div className="flex gap-4 w-max">
+                  <div className="sm:hidden w-full overflow-x-auto scrollbar-hide py-4 px-4">
+                    <div className="flex gap-4">
                       {selected.images.map((img: any, idx: number) => (
                         <div
                           key={idx}
                           className="rounded-[24px] overflow-hidden shadow-lg cursor-pointer aspect-square flex-shrink-0"
-                          style={{ width: "calc(90vw - 40px)" }}
+                          style={{ width: "calc(80vw - 32px)" }}
                           onClick={() => openLightbox(selected.images!, idx)}
                         >
                           <Image
