@@ -80,10 +80,14 @@ export default async function WorkPage({ params }: Props) {
 
   // Redirect to homepage with hash
   return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `window.location.href = '/#${slug}'`,
-      }}
-    />
+    <html>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.location.href = '/#${slug}'`,
+          }}
+        />
+      </head>
+    </html>
   )
 }
