@@ -261,7 +261,7 @@ export default function HomePage() {
       {
         threshold: 0.1,
         rootMargin: "50px 0px -50px 0px",
-      }
+      },
     );
 
     const timer = setTimeout(() => {
@@ -322,7 +322,7 @@ export default function HomePage() {
 
   const openLightbox = (images: any[], index: number) => {
     const imageUrls = images.map((img) =>
-      urlFor(img).width(2400).quality(100).url()
+      urlFor(img).width(2400).quality(100).url(),
     );
     setLightboxImages(imageUrls);
     setCurrentImageIndex(index);
@@ -335,13 +335,13 @@ export default function HomePage() {
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
-      prev < lightboxImages.length - 1 ? prev + 1 : 0
+      prev < lightboxImages.length - 1 ? prev + 1 : 0,
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev > 0 ? prev - 1 : lightboxImages.length - 1
+      prev > 0 ? prev - 1 : lightboxImages.length - 1,
     );
   };
 
@@ -401,18 +401,18 @@ export default function HomePage() {
       </Link>
 
       {/* HERO SECTION */}
-      <section 
+      <section
         className="flex flex-col items-center text-center mt-20 sm:mt-24 md:mt-28 mb-12 sm:mb-16 px-4 w-full max-w-7xl"
-        itemScope 
+        itemScope
         itemType="https://schema.org/Person"
       >
-        <h1 
+        <h1
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black leading-none tracking-tight text-[#191919]"
           itemProp="name"
         >
           ANIL EMMİLER
         </h1>
-        <p 
+        <p
           className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 text-[#191919]"
           itemProp="jobTitle"
         >
@@ -457,7 +457,7 @@ export default function HomePage() {
           `}</style>
 
           <div className="flex gap-8 sm:gap-16 md:gap-20 lg:gap-[100px] w-max">
-            {featured.map((work) => (
+            {featured.map((work, index) => (
               <div
                 key={work._id}
                 className="flex flex-col items-center flex-shrink-0"
@@ -478,6 +478,7 @@ export default function HomePage() {
                       alt={`${work.title} - ${work.category} by Anıl Emmiler`}
                       width={1200}
                       height={1200}
+                      priority={index === 0}
                       className="object-cover w-full h-full pointer-events-none"
                     />
                   ) : (
@@ -498,7 +499,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="w-full max-w-7xl mb-8 sm:mb-10 px-4 sm:px-6">
+      <section className="w-full max-w-7xl mb-8 sm:mb-10 px-4 sm:px-6 min-h-[60px] flex items-center justify-center">
         <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
           {CATEGORIES.map((c) => (
             <button
@@ -543,10 +544,15 @@ export default function HomePage() {
                     }}
                   >
                     <Image
-                      src={urlFor(w.images[2]).width(1200).height(1200).url()}
-                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
-                      width={1200}
-                      height={1200}
+                      src={urlFor(w.images[2])
+                        .width(800)
+                        .height(800)
+                        .quality(90)
+                        .url()}
+                      alt=""
+                      width={800}
+                      height={800}
+                      sizes="(max-width: 640px) 300px, 525px"
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -560,10 +566,15 @@ export default function HomePage() {
                     }}
                   >
                     <Image
-                      src={urlFor(w.images[1]).width(1200).height(1200).url()}
-                      alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
-                      width={1200}
-                      height={1200}
+                      src={urlFor(w.images[1])
+                        .width(800)
+                        .height(800)
+                        .quality(90)
+                        .url()}
+                      alt=""
+                      width={800}
+                      height={800}
+                      sizes="(max-width: 640px) 300px, 525px"
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -585,6 +596,7 @@ export default function HomePage() {
                       alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
                       width={1200}
                       height={1200}
+                      sizes="(max-width: 640px) 300px, 525px"
                       className="object-cover w-full h-full"
                     />
                   </div>
@@ -619,11 +631,16 @@ export default function HomePage() {
                 ) : w.image ? (
                   <>
                     <Image
-                      src={urlFor(w.image).width(1200).height(1200).url()}
+                      src={urlFor(w.image)
+                        .width(800)
+                        .height(800)
+                        .quality(90)
+                        .url()}
                       alt={`${w.title} - ${w.category} illustration and design by Anıl Emmiler`}
-                      width={1200}
-                      height={1200}
-                      className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
+                      width={800}
+                      height={800}
+                      sizes="(max-width: 640px) 300px, (max-width: 1024px) 400px, 525px"
+                      className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/[0.35] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <h3 className="text-white text-lg sm:text-xl font-bold px-4 text-center">
@@ -883,7 +900,7 @@ export default function HomePage() {
                                     onClick={() =>
                                       openLightbox(
                                         selected.images!,
-                                        idx + subIdx
+                                        idx + subIdx,
                                       )
                                     }
                                   >
@@ -949,7 +966,7 @@ export default function HomePage() {
                                     onClick={() =>
                                       openLightbox(
                                         selected.images!,
-                                        idx + subIdx
+                                        idx + subIdx,
                                       )
                                     }
                                   >
