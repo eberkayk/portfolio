@@ -479,6 +479,8 @@ export default function HomePage() {
                       width={1200}
                       height={1200}
                       priority={index === 0}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                      sizes="(max-width: 640px) 280px, (max-width: 768px) 350px, (max-width: 1024px) 400px, (max-width: 1280px) 450px, 500px"
                       className="object-cover w-full h-full pointer-events-none"
                     />
                   ) : (
@@ -499,21 +501,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="w-full max-w-7xl mb-8 sm:mb-10 px-4 sm:px-6 min-h-[60px] flex items-center justify-center">
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => setFilter(c.key)}
-              className={`px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base lg:text-lg font-bold rounded-full transition-all duration-300 ${
-                filter === c.key
-                  ? "bg-[#26a95a] text-[#063F14]"
-                  : "bg-[#8ad6a8] text-[#063F14] hover:bg-[#6FC491] hover:scale-105"
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+      <section className="w-full max-w-7xl mb-8 sm:mb-10 px-4 sm:px-6">
+        <div className="min-h-[60px] flex items-center justify-center">
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => setFilter(c.key)}
+                className={`px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base lg:text-lg font-bold rounded-full transition-all duration-300 ${
+                  filter === c.key
+                    ? "bg-[#26a95a] text-[#063F14]"
+                    : "bg-[#8ad6a8] text-[#063F14] hover:bg-[#6FC491] hover:scale-105"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 

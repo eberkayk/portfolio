@@ -60,6 +60,10 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
   },
+  other: {
+    'dns-prefetch': 'https://cdn.sanity.io',
+    'preconnect': 'https://cdn.sanity.io',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
