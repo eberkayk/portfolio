@@ -295,31 +295,37 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleRouteChange = () => {
+      // Check both hash and pathname
+      const hash = window.location.hash.replace("#", "");
       const pathname = window.location.pathname;
-      const match = pathname.match(/^\/work\/(.+)$/);
+      const pathMatch = pathname.match(/^\/work\/(.+)$/);
 
-      if (match) {
-        const slug = match[1];
+      let slug = hash || (pathMatch ? pathMatch[1] : null);
+
+      if (slug) {
         const work = allWorks.find((w) => w.slug?.current === slug);
         if (work) {
           setSelected(work);
+          // Update URL to /work/slug format if currently on hash
+          if (hash && !pathMatch) {
+            window.history.replaceState({}, "", `/work/${slug}`);
+          }
         }
-      } else {
+      } else if (!pathname.startsWith("/work/")) {
         setSelected(null);
       }
     };
 
-    // Check on mount
     handleRouteChange();
-
-    // Listen for popstate (back/forward)
     window.addEventListener("popstate", handleRouteChange);
+    window.addEventListener("hashchange", handleRouteChange);
 
     return () => {
       window.removeEventListener("popstate", handleRouteChange);
+      window.removeEventListener("hashchange", handleRouteChange);
     };
   }, [allWorks]);
-
+  
   const openLightbox = (images: any[], index: number) => {
     const imageUrls = images.map((img) =>
       urlFor(img).width(2400).quality(100).url(),
