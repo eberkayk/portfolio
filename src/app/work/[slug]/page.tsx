@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { client, urlFor } from '@/lib/sanity'
+import { redirect } from 'next/navigation'
+import { client } from '@/lib/sanity'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -14,8 +14,7 @@ async function getWork(slug: string) {
     category,
     description,
     image,
-    ogImage,
-    images
+    ogImage
   }`
   
   return await client.fetch(query, { slug })
@@ -31,19 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  // Determine OG image with proper fallback chain
-  let ogImageUrl = 'https://anilemmiler.com/og-image.jpg' // Default fallback
-
-  if (work.ogImage) {
-    // Priority 1: Dedicated OG image
-    ogImageUrl = urlFor(work.ogImage).width(1200).height(630).quality(90).url()
-  } else if (work.images && work.images.length > 0) {
-    // Priority 2: First image from gallery
-    ogImageUrl = urlFor(work.images[0]).width(1200).height(630).quality(90).url()
-  } else if (work.image) {
-    // Priority 3: Main image
-    ogImageUrl = urlFor(work.image).width(1200).height(630).quality(90).url()
-  }
+  const ogImageUrl = work.ogImage 
+    ? `https://cdn.sanity.io/images/f4lzq01e/production/${work.ogImage.asset._ref.replace('image-', '').replace('-png', '.png').replace('-jpg', '.jpg')}?w=1200&h=630`
+    : 'https://anilemmiler.com/og-image.jpg'
 
   return {
     title: `${work.title} - Anıl Emmiler`,
@@ -72,22 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function WorkPage({ params }: Props) {
   const { slug } = await params
-  const work = await getWork(slug)
-
-  if (!work) {
-    notFound()
-  }
-
-  // Redirect to homepage with hash
-  return (
-    <html>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `window.location.href = '/#${slug}'`,
-          }}
-        />
-      </head>
-    </html>
-  )
+  
+  // Redirect to homepage with hash (modal will open)
+  redirect(`/#${slug}`)
 }

@@ -64,13 +64,13 @@ export default function HomePage() {
   const openModal = (work: Work) => {
     setSelected(work);
     if (work.slug?.current) {
-      window.location.hash = work.slug.current;
+      window.history.pushState({}, "", `/work/${work.slug.current}`);
     }
   };
 
   const closeModal = () => {
     setSelected(null);
-    window.location.hash = "";
+    window.history.pushState({}, "", "/");
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -293,14 +293,14 @@ export default function HomePage() {
     workCardsRef.current = [];
   }, [filter]);
 
-  // Handle hash changes (open modal from URL)
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace("#", "");
+    const handleRouteChange = () => {
+      const pathname = window.location.pathname;
+      const match = pathname.match(/^\/work\/(.+)$/);
 
-      if (hash) {
-        // Find work by slug
-        const work = allWorks.find((w) => w.slug?.current === hash);
+      if (match) {
+        const slug = match[1];
+        const work = allWorks.find((w) => w.slug?.current === slug);
         if (work) {
           setSelected(work);
         }
@@ -309,14 +309,14 @@ export default function HomePage() {
       }
     };
 
-    // Check hash on mount
-    handleHashChange();
+    // Check on mount
+    handleRouteChange();
 
-    // Listen for hash changes
-    window.addEventListener("hashchange", handleHashChange);
+    // Listen for popstate (back/forward)
+    window.addEventListener("popstate", handleRouteChange);
 
     return () => {
-      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("popstate", handleRouteChange);
     };
   }, [allWorks]);
 
