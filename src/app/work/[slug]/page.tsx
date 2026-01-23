@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { client } from '@/lib/sanity'
+import { urlFor } from '@/lib/sanity'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -14,6 +15,7 @@ async function getWork(slug: string) {
     category,
     description,
     image,
+    images,
     ogImage
   }`
   
@@ -30,9 +32,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
   }
 
-  const ogImageUrl = work.ogImage 
-    ? `https://cdn.sanity.io/images/f4lzq01e/production/${work.ogImage.asset._ref.replace('image-', '').replace('-png', '.png').replace('-jpg', '.jpg')}?w=1200&h=630`
-    : 'https://anilemmiler.com/og-image.jpg'
+  // Determine OG image with proper fallback chain
+  let ogImageUrl = 'https://anilemmiler.com/og-image.jpg'
+
+  if (work.ogImage) {
+    ogImageUrl = urlFor(work.ogImage).width(1200).height(630).quality(90).url()
+  } else if (work.images && work.images.length > 0) {
+    ogImageUrl = urlFor(work.images[0]).width(1200).height(630).quality(90).url()
+  } else if (work.image) {
+    ogImageUrl = urlFor(work.image).width(1200).height(630).quality(90).url()
+  }
 
   return {
     title: `${work.title} - Anıl Emmiler`,
