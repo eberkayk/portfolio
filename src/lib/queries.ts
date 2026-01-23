@@ -25,7 +25,8 @@ export const ABOUT_PAGE = `
       degreeType,
       gpa,
       logo
-    }
+    },
+    "ogImage": ogImage.asset->url
   }
 `;
 

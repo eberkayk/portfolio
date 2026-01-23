@@ -163,5 +163,14 @@ export default defineType({
         },
       ],
     }),
+    defineField({
+          name: 'defaultOgImage',
+          title: 'Social Share Image (OG Image)',
+          type: 'image',
+          description: 'Default OG image used when the site is shared on social media (1200x630px recommended)',
+          options: {
+            hotspot: true,
+        },
+        }),
   ],
 })
