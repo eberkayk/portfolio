@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import * as gtag from "@/lib/analytics";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -65,6 +66,13 @@ export default function HomePage() {
     setSelected(work);
     if (work.slug?.current) {
       window.history.pushState({}, "", `/work/${work.slug.current}`);
+
+      // Track work view
+      gtag.event({
+        action: "view_work",
+        category: "engagement",
+        label: work.title,
+      });
     }
   };
 
@@ -325,7 +333,7 @@ export default function HomePage() {
       window.removeEventListener("hashchange", handleRouteChange);
     };
   }, [allWorks]);
-  
+
   const openLightbox = (images: any[], index: number) => {
     const imageUrls = images.map((img) =>
       urlFor(img).width(2400).quality(100).url(),

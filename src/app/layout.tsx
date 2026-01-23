@@ -4,6 +4,7 @@ import { Montserrat } from "next/font/google";
 import ClientLayout from "@/components/ClientLayout";
 import LenisProvider from "@/components/LenisProvider";
 import type { Metadata } from "next";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -61,8 +62,8 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
   },
   other: {
-    'dns-prefetch': 'https://cdn.sanity.io',
-    'preconnect': 'https://cdn.sanity.io',
+    "dns-prefetch": "https://cdn.sanity.io",
+    preconnect: "https://cdn.sanity.io",
   },
 };
 
@@ -74,6 +75,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
       </head>
       <body className={montserrat.className}>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
