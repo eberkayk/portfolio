@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { client } from "@/lib/sanity";
 import { ABOUT_PAGE } from "@/lib/queries";
+import Script from "next/script";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -86,6 +87,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
       </head>
       <body className={montserrat.className}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-FWPN2JPPC3"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FWPN2JPPC3');
+          `}
+        </Script>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <GoogleAnalytics GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_ID} />
         )}

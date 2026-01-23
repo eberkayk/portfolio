@@ -391,7 +391,7 @@ export default function HomePage() {
           className={`flex-shrink-0 transition-all duration-500 ${
             isAboutHovered
               ? "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16"
-              : "w-[75%] h-[75%]"
+              : "w-[87%] h-[87%] -translate-x-[3px]"
           }`}
         >
           <Lottie
