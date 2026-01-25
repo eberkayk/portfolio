@@ -28,6 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = "Professional designer and illustrator based in Istanbul. Specializing in illustration, UI/UX design, and animation. View my creative portfolio and contact me for collaborations.";
 
   return {
+    // --- SEO İYİLEŞTİRMESİ BAŞLANGIÇ ---
+    // Google'ın sitenin ana adresini anlamasını sağlar
+    metadataBase: new URL("https://anilemmiler.com"),
+    // Her sayfanın kendini işaret eden "canonical" etiketini otomatik oluşturur
+    alternates: {
+      canonical: "/",
+    },
+    // --- SEO İYİLEŞTİRMESİ BİTİŞ ---
     title,
     description,
     keywords: "Anıl Emmiler, designer, illustrator, Istanbul, UI/UX design, illustration, animation, graphic design, portfolio, Turkey",
